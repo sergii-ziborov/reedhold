@@ -40,8 +40,8 @@ pub fn read_log(bytes: &[u8]) -> Result<Vec<StoredEvent>> {
     if reader.read_u8()? != LOG_TAG {
         return Err(Error::Codec("unknown event log tag"));
     }
-    let count = usize::try_from(reader.read_u64()?)
-        .map_err(|_| Error::Codec("event log is too large"))?;
+    let count =
+        usize::try_from(reader.read_u64()?).map_err(|_| Error::Codec("event log is too large"))?;
     let mut events = Vec::with_capacity(count);
     for _ in 0..count {
         events.push(StoredEvent {

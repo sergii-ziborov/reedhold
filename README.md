@@ -27,11 +27,12 @@ it stays a separate library.
 - a sync host API that UI processes can wrap (no Tokio)
 - an MCP server so an agent can create, restore, emit, and verify
 - a local sealed store and k-of-n seed shares for reinstall / lost password
+- an in-process mesh fabric: direct, rotating-relay store-and-forward, company optional
 
 ## What is not in this repo yet
 
 - a chat UI
-- a live DHT / gossip implementation
+- a production DHT / QUIC / BLE link (the routing fabric is in-process first)
 - a token or speculative economy
 - company servers as a source of truth
 
@@ -44,7 +45,7 @@ crates/reedhold-identity    MasterSeed, roots, devices
 crates/reedhold-recovery    vault + RecoveryManifest
 crates/reedhold-event       SocialEvent kinds and envelopes
 crates/reedhold-protocol    account lifecycle over the above
-crates/reedhold-mesh        discovery, daily relay lottery, transports
+crates/reedhold-mesh        lottery, frames, in-process fabric (UDP/libp2p later)
 crates/reedhold-ads         genesis advertising token (market only)
 crates/reedhold-storage     durability classes and node budgets
 crates/reedhold-chain       compact checkpoint types

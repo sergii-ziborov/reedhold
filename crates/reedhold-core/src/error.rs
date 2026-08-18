@@ -13,6 +13,8 @@ pub enum Error {
     Recovery(&'static str),
     /// Event signature or structure failed verification.
     Event(&'static str),
+    /// Mesh routing or framing failed.
+    Mesh(&'static str),
     /// Operating-system entropy was unavailable.
     Entropy,
 }
@@ -24,6 +26,7 @@ impl fmt::Display for Error {
             Self::Identity(reason) => write!(formatter, "identity: {reason}"),
             Self::Recovery(reason) => write!(formatter, "recovery: {reason}"),
             Self::Event(reason) => write!(formatter, "event: {reason}"),
+            Self::Mesh(reason) => write!(formatter, "mesh: {reason}"),
             Self::Entropy => formatter.write_str("system entropy unavailable"),
         }
     }

@@ -32,7 +32,8 @@ pub fn split_seed(seed: &MasterSeed, threshold: u8, total: u8) -> Result<Vec<See
         usize::from(total)
     ];
     for (offset, share) in shares.iter_mut().enumerate() {
-        let index = u8::try_from(offset + 1).map_err(|_| Error::Recovery("share index overflow"))?;
+        let index =
+            u8::try_from(offset + 1).map_err(|_| Error::Recovery("share index overflow"))?;
         share.index = index;
     }
     for (byte_index, secret_byte) in secret.iter().enumerate() {

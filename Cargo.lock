@@ -515,6 +515,7 @@ dependencies = [
 name = "reedhold-mesh"
 version = "0.1.0"
 dependencies = [
+ "reedhold-codec",
  "reedhold-core",
  "sha2",
 ]

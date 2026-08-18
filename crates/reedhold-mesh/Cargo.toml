@@ -11,6 +11,7 @@ homepage.workspace = true
 publish.workspace = true
 
 [dependencies]
+reedhold-codec.workspace = true
 reedhold-core.workspace = true
 sha2.workspace = true
 
