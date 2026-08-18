@@ -408,6 +408,7 @@ dependencies = [
 name = "reedhold"
 version = "0.1.0"
 dependencies = [
+ "reedhold-ads",
  "reedhold-api",
  "reedhold-chain",
  "reedhold-client",
@@ -422,12 +423,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "reedhold-ads"
+version = "0.1.0"
+dependencies = [
+ "ed25519-dalek",
+ "reedhold-codec",
+ "reedhold-core",
+ "sha2",
+]
+
+[[package]]
 name = "reedhold-api"
 version = "0.1.0"
 dependencies = [
  "blazingly-json",
+ "reedhold-ads",
  "reedhold-core",
  "reedhold-event",
+ "reedhold-mesh",
  "reedhold-protocol",
  "reedhold-recovery",
  "serde",
@@ -501,6 +514,7 @@ name = "reedhold-mesh"
 version = "0.1.0"
 dependencies = [
  "reedhold-core",
+ "sha2",
 ]
 
 [[package]]

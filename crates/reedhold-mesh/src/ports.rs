@@ -3,7 +3,7 @@
 use reedhold_core::Digest32;
 
 /// Opaque peer identifier. Not an identity id.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct PeerId(Digest32);
 
 impl PeerId {
@@ -17,6 +17,21 @@ impl PeerId {
     #[must_use]
     pub const fn as_digest(&self) -> &Digest32 {
         &self.0
+    }
+
+    /// Hex form used by the host API.
+    #[must_use]
+    pub fn to_hex(self) -> String {
+        self.0.to_hex()
+    }
+
+    /// Parse 32 hex bytes.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`reedhold_core::Error::Codec`] when the string is not 32 bytes.
+    pub fn from_hex(hex: &str) -> reedhold_core::Result<Self> {
+        Ok(Self(Digest32::from_hex(hex)?))
     }
 }
 
@@ -39,6 +54,8 @@ pub enum DiscoveryHint {
     Ble,
     /// QR or invite hint.
     Invite,
+    /// This epoch's randomly selected transitional relay.
+    RotatingRelay,
 }
 
 /// Available transports. A client should speak more than one.

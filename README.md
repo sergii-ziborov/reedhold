@@ -22,6 +22,8 @@ it stays a separate library.
 - signed social events
 - recovery manifests that can be stored on untrusted hosts
 - ports for mesh, storage, chain, and a bounded client
+- daily rotating transitional relays; the company site is optional
+- a genesis advertising token that cannot control the mesh
 - a sync host API that UI processes can wrap (no Tokio)
 - an MCP server so an agent can create, restore, emit, and verify
 
@@ -41,7 +43,8 @@ crates/reedhold-identity    MasterSeed, roots, devices
 crates/reedhold-recovery    vault + RecoveryManifest
 crates/reedhold-event       SocialEvent kinds and envelopes
 crates/reedhold-protocol    account lifecycle over the above
-crates/reedhold-mesh        discovery / transport ports
+crates/reedhold-mesh        discovery, daily relay lottery, transports
+crates/reedhold-ads         genesis advertising token (market only)
 crates/reedhold-storage     durability classes and node budgets
 crates/reedhold-chain       compact checkpoint types
 crates/reedhold-client      light-client profile
@@ -51,7 +54,10 @@ crates/reedhold             public facade (does not include MCP)
 ```
 
 Layering is one-way. Mesh, storage, and chain do not depend on each other.
-UIs and agents never import mesh. They import `reedhold-api`.
+UIs and agents never import mesh internals. They import `reedhold-api`.
+Each UTC day the protocol redraws a small set of ordinary peers as
+transitional sync hosts. Blocking the company site or yesterday's relays
+does not halt the network.
 The facade does not depend on MCP. No crate depends on the facade.
 
 ```sh

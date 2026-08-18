@@ -8,4 +8,8 @@ pub const INVARIANTS: &[&str] = &[
     "no_network_master_key",
     "chain_does_not_store_private_bytes",
     "phone_is_not_a_durable_seeder",
+    "company_host_is_optional",
+    "rotating_relays_are_not_a_fixed_set",
+    "blocking_relays_does_not_halt_the_network",
+    "advertising_token_is_not_network_control",
 ];

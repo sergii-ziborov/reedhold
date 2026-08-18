@@ -105,6 +105,52 @@ pub(crate) fn list_invariants(_host: &mut Host, _arguments: Value) -> ToolReply 
     ToolReply::structured(invariants())
 }
 
+pub(crate) fn sync_plan(_host: &mut Host, arguments: Value) -> ToolReply {
+    let epoch = match required_str(&arguments, "epoch").and_then(parse_u64) {
+        Ok(value) => value,
+        Err(error) => return ToolReply::error(error.to_string()),
+    };
+    let prior = required_str(&arguments, "prior_commit").unwrap_or("");
+    let prior = if prior.is_empty() {
+        "00".repeat(32)
+    } else {
+        prior.to_owned()
+    };
+    let candidates = match string_list(&arguments, "candidates") {
+        Ok(value) => value,
+        Err(error) => return ToolReply::error(error.to_string()),
+    };
+    let company = arguments.get("company").and_then(Value::as_str);
+    match reedhold_api::sync_plan(epoch, &prior, &candidates, company, None) {
+        Ok(plan) => ToolReply::structured(plan),
+        Err(error) => ToolReply::error(error.to_string()),
+    }
+}
+
+pub(crate) fn advertising_limits(_host: &mut Host, _arguments: Value) -> ToolReply {
+    ToolReply::structured(reedhold_api::advertising_limits())
+}
+
+fn parse_u64(text: &str) -> Result<u64, Error> {
+    text.parse()
+        .map_err(|_| Error::Codec("expected an unsigned integer"))
+}
+
+fn string_list(arguments: &Value, key: &str) -> Result<Vec<String>, Error> {
+    let array = arguments
+        .get(key)
+        .and_then(Value::as_array)
+        .ok_or(Error::Codec("missing string array"))?;
+    let mut out = Vec::with_capacity(array.len());
+    for value in array {
+        let text = value
+            .as_str()
+            .ok_or(Error::Codec("array entry must be a string"))?;
+        out.push(text.to_owned());
+    }
+    Ok(out)
+}
+
 fn required_str<'a>(arguments: &'a Value, key: &str) -> Result<&'a str, Error> {
     arguments
         .get(key)

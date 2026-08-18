@@ -60,6 +60,18 @@ pub fn build_server() -> McpServer<Host> {
             object_schema(&[]),
             tools::list_invariants,
         )
+        .tool_with_state(
+            "sync_plan",
+            "Draw this epoch's random transitional relays. Company host is never required.",
+            sync_plan_schema(),
+            tools::sync_plan,
+        )
+        .tool_with_state(
+            "advertising_limits",
+            "Genesis advertising token: market rights only, not network control.",
+            object_schema(&[]),
+            tools::advertising_limits,
+        )
 }
 
 fn object_schema(required: &[&str]) -> Value {
@@ -75,6 +87,20 @@ fn object_schema(required: &[&str]) -> Value {
         "type": "object",
         "properties": Value::Object(properties),
         "required": Value::Array(required),
+        "additionalProperties": false
+    })
+}
+
+fn sync_plan_schema() -> Value {
+    json!({
+        "type": "object",
+        "properties": {
+            "epoch": { "type": "string" },
+            "prior_commit": { "type": "string" },
+            "candidates": { "type": "array", "items": { "type": "string" } },
+            "company": { "type": "string" }
+        },
+        "required": ["epoch", "candidates"],
         "additionalProperties": false
     })
 }

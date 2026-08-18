@@ -2,6 +2,7 @@
 resolver = "3"
 members = [
     "crates/reedhold",
+    "crates/reedhold-ads",
     "crates/reedhold-api",
     "crates/reedhold-chain",
     "crates/reedhold-client",
@@ -29,6 +30,7 @@ publish = false
 
 [workspace.dependencies]
 reedhold = { version = "0.1.0", path = "crates/reedhold" }
+reedhold-ads = { version = "0.1.0", path = "crates/reedhold-ads" }
 reedhold-api = { version = "0.1.0", path = "crates/reedhold-api" }
 reedhold-chain = { version = "0.1.0", path = "crates/reedhold-chain" }
 reedhold-client = { version = "0.1.0", path = "crates/reedhold-client" }

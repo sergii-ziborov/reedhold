@@ -25,6 +25,12 @@ pub enum DomainTag {
     SearchRoot,
     /// Content-addressed payload identifier.
     Content,
+    /// Daily sync-epoch seed.
+    SyncEpoch,
+    /// Ranking of a peer as a transitional relay.
+    RelayScore,
+    /// Genesis advertising-root domain.
+    AdvertisingRoot,
 }
 
 impl DomainTag {
@@ -40,6 +46,9 @@ impl DomainTag {
             Self::StorageRoot => "reedhold/storage-root/v1",
             Self::SearchRoot => "reedhold/search-root/v1",
             Self::Content => "reedhold/content/v1",
+            Self::SyncEpoch => "reedhold/sync-epoch/v1",
+            Self::RelayScore => "reedhold/relay-score/v1",
+            Self::AdvertisingRoot => "reedhold/ads-root/v1",
         }
     }
 
@@ -65,6 +74,9 @@ mod tests {
             DomainTag::StorageRoot,
             DomainTag::SearchRoot,
             DomainTag::Content,
+            DomainTag::SyncEpoch,
+            DomainTag::RelayScore,
+            DomainTag::AdvertisingRoot,
         ]
         .map(DomainTag::as_str);
         for (index, label) in labels.iter().enumerate() {

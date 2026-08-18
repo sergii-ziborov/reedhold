@@ -5,6 +5,7 @@
 #![forbid(unsafe_code)]
 #![doc = include_str!("../../../README.md")]
 
+pub use reedhold_ads as ads;
 pub use reedhold_api as api;
 pub use reedhold_chain as chain;
 pub use reedhold_client as client;
