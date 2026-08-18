@@ -34,7 +34,7 @@ impl Session {
         for event in &raw {
             SignedEvent::decode_verify(&event.encoded, NetworkId::DEV, &account.device_public())?;
         }
-        Ok(Self { account, log: raw })
+        Ok(Self::from_parts(account, raw))
     }
 
     /// Verified events currently held in this session.

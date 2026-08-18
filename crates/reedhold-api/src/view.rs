@@ -16,6 +16,8 @@ pub struct AccountView {
     pub device_public: String,
     /// Identity-root verifying key hex.
     pub root_public: String,
+    /// Static X25519 messaging public key hex.
+    pub messaging_public: String,
     /// Last emitted per-device sequence.
     pub sequence: u64,
     /// Network label.
@@ -29,6 +31,7 @@ impl AccountView {
             device: account.grant().device.to_hex(),
             device_public: encode_hex(&account.device_public()),
             root_public: encode_hex(&account.root_public()),
+            messaging_public: encode_hex(&account.messaging().public_bytes()),
             sequence: account.sequence(),
             network: account.network().as_str().to_owned(),
         }

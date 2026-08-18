@@ -54,13 +54,7 @@ pub fn session_from_shares(
         epoch: created.account.manifest().epoch,
         manifest_hex: reedhold_core::encode_hex(&created.account.manifest().encode()?),
     };
-    Ok((
-        Session {
-            account: created.account,
-            log: Vec::new(),
-        },
-        manifest,
-    ))
+    Ok((Session::from_parts(created.account, Vec::new()), manifest))
 }
 
 fn share_view(share: &SeedShare) -> ShareView {

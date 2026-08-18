@@ -16,4 +16,6 @@ pub const INVARIANTS: &[&str] = &[
     "threshold_recovery_needs_k_of_n",
     "third_holder_loss_is_survivable",
     "company_is_not_a_required_shard_holder",
+    "outsiders_cannot_read_talk",
+    "small_groups_are_not_mls_yet",
 ];

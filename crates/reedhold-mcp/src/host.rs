@@ -1,14 +1,17 @@
 //! One in-memory session for the agent process.
 
-use reedhold_api::{AccountView, DurableSession, EventView, ManifestView, MeshSession, Session};
+use reedhold_api::{
+    AccountView, DurableSession, EventView, ManifestView, MeshSession, Session, TalkNet,
+};
 use reedhold_core::{Error, Result};
 
 /// Mutable host state shared by every MCP tool.
 #[derive(Default)]
 pub struct Host {
-    session: Option<Session>,
+    pub(crate) session: Option<Session>,
     pub(crate) mesh: Option<MeshSession>,
     pub(crate) durable: Option<DurableSession>,
+    pub(crate) talk: Option<TalkNet>,
 }
 
 impl Host {
@@ -98,13 +101,13 @@ impl Host {
         Ok((view, manifest))
     }
 
-    fn session(&self) -> Result<&Session> {
+    pub(crate) fn session(&self) -> Result<&Session> {
         self.session
             .as_ref()
             .ok_or(Error::Identity("no unlocked session"))
     }
 
-    fn session_mut(&mut self) -> Result<&mut Session> {
+    pub(crate) fn session_mut(&mut self) -> Result<&mut Session> {
         self.session
             .as_mut()
             .ok_or(Error::Identity("no unlocked session"))

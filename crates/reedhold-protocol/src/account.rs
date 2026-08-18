@@ -2,7 +2,7 @@
 
 use reedhold_core::{IdentityId, NetworkId, Result};
 use reedhold_event::{EventKind, SignedEvent, content_id, sign_event};
-use reedhold_identity::{DeviceGrant, DeviceKeys, IdentityBundle, MasterSeed};
+use reedhold_identity::{DeviceGrant, DeviceKeys, IdentityBundle, MasterSeed, MessagingKeys};
 use reedhold_recovery::{KdfParams, RecoveryManifest, SeedShare, seal_seed, split_seed};
 
 /// Newly created account plus the first recovery manifest.
@@ -94,6 +94,12 @@ impl Account {
     #[must_use]
     pub fn device_public(&self) -> [u8; 32] {
         self.device.public_bytes()
+    }
+
+    /// Static messaging keys for DMs and group-key wrap.
+    #[must_use]
+    pub const fn messaging(&self) -> &MessagingKeys {
+        &self.bundle.messaging
     }
 
     /// Identity-root public key.

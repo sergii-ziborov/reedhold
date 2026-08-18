@@ -31,6 +31,10 @@ pub enum DomainTag {
     RelayScore,
     /// Genesis advertising-root domain.
     AdvertisingRoot,
+    /// Pairwise DM key from static X25519 agreement.
+    TalkPair,
+    /// Small-group conversation identifier.
+    TalkGroup,
 }
 
 impl DomainTag {
@@ -49,6 +53,8 @@ impl DomainTag {
             Self::SyncEpoch => "reedhold/sync-epoch/v1",
             Self::RelayScore => "reedhold/relay-score/v1",
             Self::AdvertisingRoot => "reedhold/ads-root/v1",
+            Self::TalkPair => "reedhold/talk-pair/v1",
+            Self::TalkGroup => "reedhold/talk-group/v1",
         }
     }
 
@@ -77,6 +83,8 @@ mod tests {
             DomainTag::SyncEpoch,
             DomainTag::RelayScore,
             DomainTag::AdvertisingRoot,
+            DomainTag::TalkPair,
+            DomainTag::TalkGroup,
         ]
         .map(DomainTag::as_str);
         for (index, label) in labels.iter().enumerate() {

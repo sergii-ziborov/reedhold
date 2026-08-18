@@ -26,6 +26,14 @@ pub enum EventKind {
     DirectMessage = 10,
     /// Device authorization / revocation record.
     DeviceAuthorize = 11,
+    /// Create a small group (shared epoch key, not MLS).
+    GroupCreate = 12,
+    /// Wrap a group epoch key for one member.
+    GroupInvite = 13,
+    /// Sealed small-group message.
+    GroupMessage = 14,
+    /// Member left or was removed. Key rotation is a later epoch.
+    GroupLeave = 15,
 }
 
 impl EventKind {
@@ -50,6 +58,10 @@ impl EventKind {
             9 => Some(Self::ProfileUpdate),
             10 => Some(Self::DirectMessage),
             11 => Some(Self::DeviceAuthorize),
+            12 => Some(Self::GroupCreate),
+            13 => Some(Self::GroupInvite),
+            14 => Some(Self::GroupMessage),
+            15 => Some(Self::GroupLeave),
             _ => None,
         }
     }
@@ -69,6 +81,10 @@ impl EventKind {
             Self::ProfileUpdate => "profile_update",
             Self::DirectMessage => "direct_message",
             Self::DeviceAuthorize => "device_authorize",
+            Self::GroupCreate => "group_create",
+            Self::GroupInvite => "group_invite",
+            Self::GroupMessage => "group_message",
+            Self::GroupLeave => "group_leave",
         }
     }
 
@@ -87,6 +103,10 @@ impl EventKind {
             "profile_update" => Some(Self::ProfileUpdate),
             "direct_message" => Some(Self::DirectMessage),
             "device_authorize" => Some(Self::DeviceAuthorize),
+            "group_create" => Some(Self::GroupCreate),
+            "group_invite" => Some(Self::GroupInvite),
+            "group_message" => Some(Self::GroupMessage),
+            "group_leave" => Some(Self::GroupLeave),
             _ => None,
         }
     }

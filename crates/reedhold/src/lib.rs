@@ -21,8 +21,8 @@ pub use reedhold_store as store;
 
 pub use reedhold_api::{AccountView, EventView, ManifestView, Session};
 pub use reedhold_core::{
-    ContentId, DeviceId, Digest32, DomainTag, Error, IdentityId, NetworkId, PROTOCOL_NAME,
-    PROTOCOL_VERSION, Result,
+    ContentId, ConversationId, DeviceId, Digest32, DomainTag, Error, IdentityId, NetworkId,
+    PROTOCOL_NAME, PROTOCOL_VERSION, Result,
 };
 pub use reedhold_event::{EventKind, SignedEvent, content_id, sign_event};
 pub use reedhold_identity::{IdentityBundle, MasterSeed};

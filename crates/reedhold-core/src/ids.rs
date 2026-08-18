@@ -63,6 +63,21 @@ impl IdentityId {
     pub fn to_uri(self) -> String {
         format!("reedhold:identity:{}", self.0.to_hex())
     }
+
+    /// Lower-case identity digest hex. Also the in-process talk peer id.
+    #[must_use]
+    pub fn to_hex(self) -> String {
+        self.0.to_hex()
+    }
+
+    /// Parse 32 hex bytes.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`crate::Error::Codec`] when the string is not 32 hex bytes.
+    pub fn from_hex(hex: &str) -> crate::Result<Self> {
+        Ok(Self(Digest32::from_hex(hex)?))
+    }
 }
 
 /// Authorized device belonging to one identity.
@@ -104,6 +119,39 @@ impl ContentId {
     #[must_use]
     pub const fn as_digest(&self) -> &Digest32 {
         &self.0
+    }
+}
+
+/// Direct-message or small-group conversation.
+#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct ConversationId(Digest32);
+
+impl ConversationId {
+    /// Construct from a digest.
+    #[must_use]
+    pub const fn from_digest(digest: Digest32) -> Self {
+        Self(digest)
+    }
+
+    /// Borrow the digest.
+    #[must_use]
+    pub const fn as_digest(&self) -> &Digest32 {
+        &self.0
+    }
+
+    /// Lower-case hex.
+    #[must_use]
+    pub fn to_hex(self) -> String {
+        self.0.to_hex()
+    }
+
+    /// Parse 32 hex bytes.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`crate::Error::Codec`] when the string is not 32 hex bytes.
+    pub fn from_hex(hex: &str) -> crate::Result<Self> {
+        Ok(Self(Digest32::from_hex(hex)?))
     }
 }
 

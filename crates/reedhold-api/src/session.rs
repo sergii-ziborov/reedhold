@@ -1,11 +1,12 @@
 //! In-process session used by every host.
 
 use crate::view::{AccountView, EventView, ManifestView};
-use reedhold_core::{Error, NetworkId, Result, decode_hex, decode32};
+use reedhold_core::{ConversationId, Error, NetworkId, Result, decode_hex, decode32};
 use reedhold_event::{EventKind, SignedEvent, open_message, seal_message};
-use reedhold_protocol::{Account, create_account, restore_account};
+use reedhold_protocol::{Account, Circle, create_account, restore_account};
 use reedhold_recovery::KdfParams;
 use reedhold_store::StoredEvent;
+use std::collections::BTreeMap;
 
 /// Freshly created session plus the first manifest.
 pub struct Created {
@@ -19,6 +20,7 @@ pub struct Created {
 pub struct Session {
     pub(crate) account: Account,
     pub(crate) log: Vec<StoredEvent>,
+    pub(crate) circles: BTreeMap<ConversationId, Circle>,
 }
 
 impl Session {
@@ -37,10 +39,7 @@ impl Session {
         )?;
         let manifest = manifest_view(created.account.manifest())?;
         Ok(Created {
-            session: Self {
-                account: created.account,
-                log: Vec::new(),
-            },
+            session: Self::from_parts(created.account, Vec::new()),
             manifest,
         })
     }
@@ -54,10 +53,10 @@ impl Session {
         let device = decode32(device_secret_hex)?;
         let bytes = decode_hex(manifest_hex)?;
         let manifest = reedhold_recovery::RecoveryManifest::decode(&bytes, NetworkId::DEV)?;
-        Ok(Self {
-            account: restore_account(&manifest, password.as_bytes(), &device)?,
-            log: Vec::new(),
-        })
+        Ok(Self::from_parts(
+            restore_account(&manifest, password.as_bytes(), &device)?,
+            Vec::new(),
+        ))
     }
 
     /// Public snapshot.
@@ -128,6 +127,34 @@ impl Session {
         let event = self.account.emit(EventKind::DirectMessage, &body)?;
         self.push_log(&event, &body)?;
         EventView::from_event(&event, &body)
+    }
+
+    pub(crate) fn from_parts(account: Account, log: Vec<StoredEvent>) -> Self {
+        Self {
+            account,
+            log,
+            circles: BTreeMap::new(),
+        }
+    }
+
+    /// Identity digest hex. The in-process talk net uses this as the peer id.
+    #[must_use]
+    pub fn peer_hex(&self) -> String {
+        self.account.identity().to_hex()
+    }
+
+    pub(crate) fn remember_circle(&mut self, circle: Circle) {
+        self.circles.insert(circle.id, circle);
+    }
+
+    pub(crate) fn circle(&self, id: ConversationId) -> Result<&Circle> {
+        self.circles.get(&id).ok_or(Error::Event("unknown group"))
+    }
+
+    pub(crate) fn circle_mut(&mut self, id: ConversationId) -> Result<&mut Circle> {
+        self.circles
+            .get_mut(&id)
+            .ok_or(Error::Event("unknown group"))
     }
 
     pub(crate) fn push_log(&mut self, event: &SignedEvent, body: &[u8]) -> Result<()> {

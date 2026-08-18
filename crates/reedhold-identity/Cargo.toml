@@ -17,6 +17,7 @@ hkdf.workspace = true
 reedhold-codec.workspace = true
 reedhold-core.workspace = true
 sha2.workspace = true
+x25519-dalek.workspace = true
 
 [lints]
 workspace = true

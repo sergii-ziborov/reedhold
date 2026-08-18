@@ -6,6 +6,7 @@ use crate::tools;
 use crate::tools_durable;
 use crate::tools_mesh;
 use crate::tools_store;
+use crate::tools_talk;
 use mcport::McpServer;
 
 pub(crate) fn with_account_tools(server: McpServer<Host>) -> McpServer<Host> {
@@ -163,5 +164,63 @@ pub(crate) fn with_store_and_mesh(server: McpServer<Host>) -> McpServer<Host> {
             "Rebuild missing shards onto surviving holders.",
             object_schema(&["id"]),
             tools_durable::durable_repair,
+        )
+}
+
+pub(crate) fn with_talk(server: McpServer<Host>) -> McpServer<Host> {
+    server
+        .tool_with_state(
+            "talk_open",
+            "Open the talk overlay. Peer ids are identity digests. Company is optional.",
+            sync_plan_schema(),
+            tools_talk::talk_open,
+        )
+        .tool_with_state(
+            "talk_online",
+            "Bring a talk peer online and deliver waiting mail.",
+            object_schema(&["peer"]),
+            tools_talk::talk_online,
+        )
+        .tool_with_state(
+            "talk_offline",
+            "Take a talk peer offline.",
+            object_schema(&["peer"]),
+            tools_talk::talk_offline,
+        )
+        .tool_with_state(
+            "talk_block",
+            "Block a host. Direct talk between live peers still works.",
+            object_schema(&["peer"]),
+            tools_talk::talk_block,
+        )
+        .tool_with_state(
+            "talk_dm",
+            "Seal a pairwise DM and send it over the mesh.",
+            object_schema(&["to", "to_msg_pub", "plaintext"]),
+            tools_talk::talk_dm,
+        )
+        .tool_with_state(
+            "talk_create_group",
+            "Create a small group with a shared epoch key. MLS is later.",
+            object_schema(&["name"]),
+            tools_talk::talk_create_group,
+        )
+        .tool_with_state(
+            "talk_invite",
+            "Wrap the group key for one member and send the invite.",
+            object_schema(&["group", "member", "member_msg_pub"]),
+            tools_talk::talk_invite,
+        )
+        .tool_with_state(
+            "talk_send",
+            "Fan a sealed group message out to every other member.",
+            object_schema(&["group", "plaintext"]),
+            tools_talk::talk_send,
+        )
+        .tool_with_state(
+            "talk_inbox",
+            "Drain and decrypt talk for the unlocked identity.",
+            object_schema(&[]),
+            tools_talk::talk_inbox,
         )
 }

@@ -1,6 +1,7 @@
 //! Random master seed. Never derived from a password.
 
 use crate::device::DeviceAuthority;
+use crate::messaging::MessagingKeys;
 use crate::root::IdentityRoot;
 use core::fmt;
 use reedhold_core::{Error, Result};
@@ -40,10 +41,12 @@ impl MasterSeed {
     pub fn unlock(&self) -> Result<IdentityBundle> {
         let root = IdentityRoot::derive(&self.0)?;
         let devices = DeviceAuthority::derive(&self.0)?;
+        let messaging = MessagingKeys::derive(&self.0)?;
         Ok(IdentityBundle {
             identity: root.identity,
             root,
             devices,
+            messaging,
         })
     }
 }
@@ -63,6 +66,8 @@ pub struct IdentityBundle {
     pub root: IdentityRoot,
     /// Device authorization derived from the same seed.
     pub devices: DeviceAuthority,
+    /// Static X25519 messaging keys. Not the identity-root signer.
+    pub messaging: MessagingKeys,
 }
 
 #[cfg(test)]
