@@ -5,5 +5,6 @@
 mod host;
 mod server;
 mod tools;
+mod tools_store;
 
 pub use server::build_server;

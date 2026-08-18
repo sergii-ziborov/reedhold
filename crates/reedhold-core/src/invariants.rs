@@ -12,4 +12,6 @@ pub const INVARIANTS: &[&str] = &[
     "rotating_relays_are_not_a_fixed_set",
     "blocking_relays_does_not_halt_the_network",
     "advertising_token_is_not_network_control",
+    "local_store_holds_no_plaintext_seed",
+    "threshold_recovery_needs_k_of_n",
 ];

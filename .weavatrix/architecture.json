@@ -60,6 +60,11 @@
       "paths": ["crates/reedhold-client"]
     },
     {
+      "id": "store",
+      "name": "Local sealed manifest and event log",
+      "paths": ["crates/reedhold-store"]
+    },
+    {
       "id": "api",
       "name": "Sync host session for every UI and MCP",
       "paths": ["crates/reedhold-api"]
@@ -213,6 +218,13 @@
       "kinds": ["imports", "re_exports", "depends_on"]
     },
     {
+      "id": "store-is-local-only",
+      "action": "forbid",
+      "from": ["store"],
+      "to": ["mesh", "ads", "chain", "client", "api", "mcp", "facade", "identity", "protocol"],
+      "kinds": ["imports", "re_exports", "depends_on"]
+    },
+    {
       "id": "api-is-the-host-surface",
       "action": "forbid",
       "from": ["api"],
@@ -277,7 +289,8 @@
         "client",
         "api",
         "mcp",
-        "ads"
+        "ads",
+        "store"
       ],
       "to": ["facade"],
       "kinds": ["imports", "re_exports", "depends_on"]

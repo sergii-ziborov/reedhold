@@ -58,6 +58,44 @@ impl Host {
         self.session_mut()?.emit_sealed(conversation_key, plaintext)
     }
 
+    pub(crate) fn save(&self, dir: &str) -> Result<()> {
+        self.session()?.save(dir)
+    }
+
+    pub(crate) fn load(
+        &mut self,
+        dir: &str,
+        password: &str,
+        device_secret: &str,
+    ) -> Result<AccountView> {
+        let session = Session::load(dir, password, device_secret)?;
+        let view = session.view();
+        self.session = Some(session);
+        Ok(view)
+    }
+
+    pub(crate) fn split_recovery(
+        &self,
+        threshold: u8,
+        total: u8,
+    ) -> Result<Vec<reedhold_api::ShareView>> {
+        self.session()?.split_recovery(threshold, total)
+    }
+
+    pub(crate) fn combine_recovery(
+        &mut self,
+        shares: &[reedhold_api::ShareView],
+        threshold: u8,
+        password: &str,
+        device_secret: &str,
+    ) -> Result<(AccountView, ManifestView)> {
+        let (session, manifest) =
+            reedhold_api::session_from_shares(shares, threshold, password, device_secret)?;
+        let view = session.view();
+        self.session = Some(session);
+        Ok((view, manifest))
+    }
+
     fn session(&self) -> Result<&Session> {
         self.session
             .as_ref()

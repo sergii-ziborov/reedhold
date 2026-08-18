@@ -26,6 +26,7 @@ fn crate_manifests_respect_the_layering() {
         "reedhold-chain",
         "reedhold-client",
         "reedhold-ads",
+        "reedhold-store",
         "reedhold-api",
         "reedhold-mcp",
     ] {
@@ -43,6 +44,7 @@ fn crate_manifests_respect_the_layering() {
         "reedhold-chain",
         "reedhold-client",
         "reedhold-ads",
+        "reedhold-store",
     ] {
         assert_no_dep(&root, crate_name, HOSTS);
     }
@@ -64,6 +66,18 @@ fn crate_manifests_respect_the_layering() {
         &["reedhold-identity", "reedhold-protocol"],
     );
     assert_no_dep(&root, "reedhold-mesh", &["reedhold-ads"]);
+    assert_no_dep(
+        &root,
+        "reedhold-store",
+        &[
+            "reedhold-mesh",
+            "reedhold-ads",
+            "reedhold-identity",
+            "reedhold-protocol",
+            "reedhold-client",
+            "reedhold-chain",
+        ],
+    );
     assert_no_dep(
         &root,
         "reedhold-mcp",

@@ -5,5 +5,5 @@
 mod account;
 mod restore;
 
-pub use account::{Account, CreatedAccount, create_account};
+pub use account::{Account, CreatedAccount, create_account, open_seed};
 pub use restore::restore_account;

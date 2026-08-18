@@ -2,6 +2,7 @@
 
 use crate::host::Host;
 use crate::tools;
+use crate::tools_store;
 use mcport::{McpServer, Value, json};
 
 /// Build the Reedhold MCP server.
@@ -72,6 +73,30 @@ pub fn build_server() -> McpServer<Host> {
             object_schema(&[]),
             tools::advertising_limits,
         )
+        .tool_with_state(
+            "save_store",
+            "Write the sealed manifest and signed event log to a local directory.",
+            object_schema(&["path"]),
+            tools_store::save_store,
+        )
+        .tool_with_state(
+            "load_store",
+            "Reinstall from a local directory using username-equivalent password.",
+            object_schema(&["path", "password", "device_secret"]),
+            tools_store::load_store,
+        )
+        .tool_with_state(
+            "split_recovery",
+            "Split the unlocked MasterSeed into k-of-n shares. One share is useless.",
+            object_schema(&["threshold", "total"]),
+            tools_store::split_recovery,
+        )
+        .tool_with_state(
+            "combine_recovery",
+            "Restore an identity from enough shares and a new password.",
+            combine_schema(),
+            tools_store::combine_recovery,
+        )
 }
 
 fn object_schema(required: &[&str]) -> Value {
@@ -101,6 +126,30 @@ fn sync_plan_schema() -> Value {
             "company": { "type": "string" }
         },
         "required": ["epoch", "candidates"],
+        "additionalProperties": false
+    })
+}
+
+fn combine_schema() -> Value {
+    json!({
+        "type": "object",
+        "properties": {
+            "threshold": { "type": "string" },
+            "password": { "type": "string" },
+            "device_secret": { "type": "string" },
+            "shares": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "index": { "type": "string" },
+                        "body_hex": { "type": "string" }
+                    },
+                    "required": ["index", "body_hex"]
+                }
+            }
+        },
+        "required": ["threshold", "password", "device_secret", "shares"],
         "additionalProperties": false
     })
 }

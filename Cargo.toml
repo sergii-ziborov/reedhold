@@ -15,6 +15,7 @@ members = [
     "crates/reedhold-protocol",
     "crates/reedhold-recovery",
     "crates/reedhold-storage",
+    "crates/reedhold-store",
 ]
 
 [workspace.package]
@@ -43,6 +44,7 @@ reedhold-mesh = { version = "0.1.0", path = "crates/reedhold-mesh" }
 reedhold-protocol = { version = "0.1.0", path = "crates/reedhold-protocol" }
 reedhold-recovery = { version = "0.1.0", path = "crates/reedhold-recovery" }
 reedhold-storage = { version = "0.1.0", path = "crates/reedhold-storage" }
+reedhold-store = { version = "0.1.0", path = "crates/reedhold-store" }
 
 argon2 = { version = "0.5.3", default-features = false, features = ["alloc"] }
 blazingly-json = "0.1.5"

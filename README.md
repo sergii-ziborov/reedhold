@@ -26,6 +26,7 @@ it stays a separate library.
 - a genesis advertising token that cannot control the mesh
 - a sync host API that UI processes can wrap (no Tokio)
 - an MCP server so an agent can create, restore, emit, and verify
+- a local sealed store and k-of-n seed shares for reinstall / lost password
 
 ## What is not in this repo yet
 
@@ -48,6 +49,7 @@ crates/reedhold-ads         genesis advertising token (market only)
 crates/reedhold-storage     durability classes and node budgets
 crates/reedhold-chain       compact checkpoint types
 crates/reedhold-client      light-client profile
+crates/reedhold-store       local sealed manifest + signed event log
 crates/reedhold-api         sync host session (Swift / Kotlin / desktop)
 crates/reedhold-mcp         MCP stdio binary `reedhold`
 crates/reedhold             public facade (does not include MCP)

@@ -3,7 +3,7 @@
 use reedhold_core::{IdentityId, NetworkId, Result};
 use reedhold_event::{EventKind, SignedEvent, content_id, sign_event};
 use reedhold_identity::{DeviceGrant, DeviceKeys, IdentityBundle, MasterSeed};
-use reedhold_recovery::{KdfParams, RecoveryManifest, seal_seed};
+use reedhold_recovery::{KdfParams, RecoveryManifest, SeedShare, seal_seed, split_seed};
 
 /// Newly created account plus the first recovery manifest.
 pub struct CreatedAccount {
@@ -125,6 +125,15 @@ impl Account {
     pub const fn network(&self) -> NetworkId {
         self.network
     }
+
+    /// Split the master seed into `total` shares, `threshold` of which restore it.
+    ///
+    /// # Errors
+    ///
+    /// Returns a recovery error when the threshold is invalid.
+    pub fn split_seed(&self, threshold: u8, total: u8) -> Result<Vec<SeedShare>> {
+        split_seed(&self.seed, threshold, total)
+    }
 }
 
 /// Create an account from a fresh seed and a password-protected vault.
@@ -138,7 +147,27 @@ pub fn create_account(
     device_secret: &[u8; 32],
     params: KdfParams,
 ) -> Result<CreatedAccount> {
-    let seed = MasterSeed::generate()?;
+    open_seed(
+        network,
+        MasterSeed::generate()?,
+        password,
+        device_secret,
+        params,
+    )
+}
+
+/// Open an existing seed (from shares or an unsealed vault) as a live account.
+///
+/// # Errors
+///
+/// Returns an identity or recovery error.
+pub fn open_seed(
+    network: NetworkId,
+    seed: MasterSeed,
+    password: &[u8],
+    device_secret: &[u8; 32],
+    params: KdfParams,
+) -> Result<CreatedAccount> {
     let bundle = seed.unlock()?;
     let device = bundle.devices.device_keys(device_secret)?;
     let grant = DeviceGrant::issue(&bundle.root, &device, 1);

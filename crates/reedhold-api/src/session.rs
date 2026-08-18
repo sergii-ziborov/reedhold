@@ -5,6 +5,7 @@ use reedhold_core::{Error, NetworkId, Result, decode_hex, decode32};
 use reedhold_event::{EventKind, SignedEvent, open_message, seal_message};
 use reedhold_protocol::{Account, create_account, restore_account};
 use reedhold_recovery::KdfParams;
+use reedhold_store::StoredEvent;
 
 /// Freshly created session plus the first manifest.
 pub struct Created {
@@ -14,9 +15,10 @@ pub struct Created {
     pub manifest: ManifestView,
 }
 
-/// Unlocked account. Hosts keep this in memory; they persist only the manifest.
+/// Unlocked account. Hosts keep this in memory and persist via `LocalStore`.
 pub struct Session {
-    account: Account,
+    pub(crate) account: Account,
+    pub(crate) log: Vec<StoredEvent>,
 }
 
 impl Session {
@@ -37,6 +39,7 @@ impl Session {
         Ok(Created {
             session: Self {
                 account: created.account,
+                log: Vec::new(),
             },
             manifest,
         })
@@ -53,6 +56,7 @@ impl Session {
         let manifest = reedhold_recovery::RecoveryManifest::decode(&bytes, NetworkId::DEV)?;
         Ok(Self {
             account: restore_account(&manifest, password.as_bytes(), &device)?,
+            log: Vec::new(),
         })
     }
 
@@ -80,6 +84,7 @@ impl Session {
         let kind = EventKind::from_name(kind).ok_or(Error::Event("unknown event kind"))?;
         let body = payload.as_bytes();
         let event = self.account.emit(kind, body)?;
+        self.push_log(&event, body)?;
         EventView::from_event(&event, body)
     }
 
@@ -121,7 +126,16 @@ impl Session {
         let envelope = seal_message(&key, plaintext.as_bytes())?;
         let body = envelope.encode()?;
         let event = self.account.emit(EventKind::DirectMessage, &body)?;
+        self.push_log(&event, &body)?;
         EventView::from_event(&event, &body)
+    }
+
+    pub(crate) fn push_log(&mut self, event: &SignedEvent, body: &[u8]) -> Result<()> {
+        self.log.push(StoredEvent {
+            encoded: event.encode()?,
+            body: body.to_vec(),
+        });
+        Ok(())
     }
 
     /// Open a sealed envelope hex with a conversation key.

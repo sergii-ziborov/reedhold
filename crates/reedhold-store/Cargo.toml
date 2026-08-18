@@ -1,6 +1,6 @@
 [package]
-name = "reedhold-api"
-description = "Sync host API for Reedhold: Swift, Kotlin, desktop, and MCP share this crate"
+name = "reedhold-store"
+description = "Local encrypted Reedhold persistence: manifest + signed event log"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
@@ -11,15 +11,10 @@ homepage.workspace = true
 publish.workspace = true
 
 [dependencies]
-blazingly-json.workspace = true
-reedhold-ads.workspace = true
+reedhold-codec.workspace = true
 reedhold-core.workspace = true
 reedhold-event.workspace = true
-reedhold-mesh.workspace = true
-reedhold-protocol.workspace = true
 reedhold-recovery.workspace = true
-reedhold-store.workspace = true
-serde.workspace = true
 
 [lints]
 workspace = true

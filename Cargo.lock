@@ -420,6 +420,7 @@ dependencies = [
  "reedhold-protocol",
  "reedhold-recovery",
  "reedhold-storage",
+ "reedhold-store",
 ]
 
 [[package]]
@@ -443,6 +444,7 @@ dependencies = [
  "reedhold-mesh",
  "reedhold-protocol",
  "reedhold-recovery",
+ "reedhold-store",
  "serde",
 ]
 
@@ -544,6 +546,16 @@ name = "reedhold-storage"
 version = "0.1.0"
 dependencies = [
  "reedhold-core",
+]
+
+[[package]]
+name = "reedhold-store"
+version = "0.1.0"
+dependencies = [
+ "reedhold-codec",
+ "reedhold-core",
+ "reedhold-event",
+ "reedhold-recovery",
 ]
 
 [[package]]
