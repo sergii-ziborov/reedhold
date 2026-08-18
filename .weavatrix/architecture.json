@@ -227,7 +227,7 @@
       "id": "api-is-the-host-surface",
       "action": "forbid",
       "from": ["api"],
-      "to": ["storage", "chain", "client", "mcp", "facade"],
+      "to": ["chain", "client", "mcp", "facade"],
       "kinds": ["imports", "re_exports", "depends_on"]
     },
     {

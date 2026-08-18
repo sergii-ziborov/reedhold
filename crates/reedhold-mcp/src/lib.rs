@@ -4,10 +4,12 @@
 
 mod catalog;
 mod host;
+mod host_durable;
 mod host_mesh;
 mod schema;
 mod server;
 mod tools;
+mod tools_durable;
 mod tools_mesh;
 mod tools_store;
 

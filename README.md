@@ -28,6 +28,7 @@ it stays a separate library.
 - an MCP server so an agent can create, restore, emit, and verify
 - a local sealed store and k-of-n seed shares for reinstall / lost password
 - an in-process mesh fabric: direct, rotating-relay store-and-forward, company optional
+- Reed-Solomon durable objects: 4-of-6 for identity, survive a third of holders, then repair
 
 ## What is not in this repo yet
 
@@ -47,7 +48,7 @@ crates/reedhold-event       SocialEvent kinds and envelopes
 crates/reedhold-protocol    account lifecycle over the above
 crates/reedhold-mesh        lottery, frames, in-process fabric (UDP/libp2p later)
 crates/reedhold-ads         genesis advertising token (market only)
-crates/reedhold-storage     durability classes and node budgets
+crates/reedhold-storage     erasure, placement, quotas, durable grid
 crates/reedhold-chain       compact checkpoint types
 crates/reedhold-client      light-client profile
 crates/reedhold-store       local sealed manifest + signed event log

@@ -1,8 +1,9 @@
 //! Split MCP catalog so no function exceeds the 100-line budget.
 
 use crate::host::Host;
-use crate::schema::{combine_schema, object_schema, sync_plan_schema};
+use crate::schema::{combine_schema, holders_schema, object_schema, sync_plan_schema};
 use crate::tools;
+use crate::tools_durable;
 use crate::tools_mesh;
 use crate::tools_store;
 use mcport::McpServer;
@@ -132,5 +133,35 @@ pub(crate) fn with_store_and_mesh(server: McpServer<Host>) -> McpServer<Host> {
             "Read delivered payloads for a peer.",
             object_schema(&["peer"]),
             tools_mesh::mesh_drain,
+        )
+        .tool_with_state(
+            "durable_open",
+            "Open a durable shard grid. Company is never a required holder.",
+            holders_schema(),
+            tools_durable::durable_open,
+        )
+        .tool_with_state(
+            "durable_put",
+            "Erasure-encode and place an object (critical = 4-of-6).",
+            object_schema(&["payload"]),
+            tools_durable::durable_put,
+        )
+        .tool_with_state(
+            "durable_get",
+            "Reconstruct an object from any k live shards.",
+            object_schema(&["id"]),
+            tools_durable::durable_get,
+        )
+        .tool_with_state(
+            "durable_kill",
+            "Drop a holder and its contracted shards.",
+            object_schema(&["holder"]),
+            tools_durable::durable_kill,
+        )
+        .tool_with_state(
+            "durable_repair",
+            "Rebuild missing shards onto surviving holders.",
+            object_schema(&["id"]),
+            tools_durable::durable_repair,
         )
 }

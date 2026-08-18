@@ -33,6 +33,18 @@ pub(crate) fn sync_plan_schema() -> Value {
     })
 }
 
+pub(crate) fn holders_schema() -> Value {
+    json!({
+        "type": "object",
+        "properties": {
+            "holders": { "type": "array", "items": { "type": "string" } },
+            "company": { "type": "string" }
+        },
+        "required": ["holders"],
+        "additionalProperties": false
+    })
+}
+
 pub(crate) fn combine_schema() -> Value {
     json!({
         "type": "object",

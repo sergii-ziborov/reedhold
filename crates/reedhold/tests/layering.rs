@@ -52,12 +52,7 @@ fn crate_manifests_respect_the_layering() {
     assert_no_dep(
         &root,
         "reedhold-api",
-        &[
-            "reedhold-storage",
-            "reedhold-chain",
-            "reedhold-client",
-            "reedhold-mcp",
-        ],
+        &["reedhold-chain", "reedhold-client", "reedhold-mcp"],
     );
     assert_no_dep(&root, "reedhold-ads", NETWORK);
     assert_no_dep(

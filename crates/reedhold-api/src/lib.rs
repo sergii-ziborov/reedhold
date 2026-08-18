@@ -3,6 +3,7 @@
 #![forbid(unsafe_code)]
 
 mod ads;
+mod durable;
 mod mesh;
 mod persist;
 mod session;
@@ -11,6 +12,7 @@ mod sync;
 mod view;
 
 pub use ads::{AdvertisingLimitsView, advertising_limits};
+pub use durable::{DurableSession, ObjectView};
 pub use mesh::{MeshSession, RouteView};
 pub use session::{Created, Session};
 pub use shares::{ShareView, session_from_shares};

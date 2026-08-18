@@ -15,6 +15,8 @@ pub enum Error {
     Event(&'static str),
     /// Mesh routing or framing failed.
     Mesh(&'static str),
+    /// Durable storage, erasure, or quota failed.
+    Storage(&'static str),
     /// Operating-system entropy was unavailable.
     Entropy,
 }
@@ -27,6 +29,7 @@ impl fmt::Display for Error {
             Self::Recovery(reason) => write!(formatter, "recovery: {reason}"),
             Self::Event(reason) => write!(formatter, "event: {reason}"),
             Self::Mesh(reason) => write!(formatter, "mesh: {reason}"),
+            Self::Storage(reason) => write!(formatter, "storage: {reason}"),
             Self::Entropy => formatter.write_str("system entropy unavailable"),
         }
     }

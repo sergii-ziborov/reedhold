@@ -14,4 +14,6 @@ pub const INVARIANTS: &[&str] = &[
     "advertising_token_is_not_network_control",
     "local_store_holds_no_plaintext_seed",
     "threshold_recovery_needs_k_of_n",
+    "third_holder_loss_is_survivable",
+    "company_is_not_a_required_shard_holder",
 ];

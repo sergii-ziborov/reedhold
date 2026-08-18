@@ -1,6 +1,6 @@
 //! One in-memory session for the agent process.
 
-use reedhold_api::{AccountView, EventView, ManifestView, MeshSession, Session};
+use reedhold_api::{AccountView, DurableSession, EventView, ManifestView, MeshSession, Session};
 use reedhold_core::{Error, Result};
 
 /// Mutable host state shared by every MCP tool.
@@ -8,6 +8,7 @@ use reedhold_core::{Error, Result};
 pub struct Host {
     session: Option<Session>,
     pub(crate) mesh: Option<MeshSession>,
+    pub(crate) durable: Option<DurableSession>,
 }
 
 impl Host {

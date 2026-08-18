@@ -55,6 +55,7 @@ ed25519-dalek = { version = "2.2.0", default-features = false, features = ["std"
 getrandom = "0.2.16"
 hkdf = "0.12.4"
 sha2 = { version = "0.10.9", default-features = false }
+reed-solomon-erasure = "6.0.0"
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
