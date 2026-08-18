@@ -22,7 +22,16 @@ impl Digest32 {
     /// Lower-case hex encoding.
     #[must_use]
     pub fn to_hex(self) -> String {
-        hex_encode(&self.0)
+        crate::hex::encode(&self.0)
+    }
+
+    /// Parse 64 hex characters.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`crate::Error::Codec`] when the string is not 32 hex bytes.
+    pub fn from_hex(hex: &str) -> crate::Result<Self> {
+        Ok(Self(crate::hex::decode32(hex)?))
     }
 }
 
@@ -72,6 +81,12 @@ impl DeviceId {
     pub const fn as_digest(&self) -> &Digest32 {
         &self.0
     }
+
+    /// Lower-case hex of the device id.
+    #[must_use]
+    pub fn to_hex(self) -> String {
+        self.0.to_hex()
+    }
 }
 
 /// Content-addressed payload identifier.
@@ -90,16 +105,6 @@ impl ContentId {
     pub const fn as_digest(&self) -> &Digest32 {
         &self.0
     }
-}
-
-fn hex_encode(bytes: &[u8; 32]) -> String {
-    const TABLE: &[u8; 16] = b"0123456789abcdef";
-    let mut out = String::with_capacity(64);
-    for byte in bytes {
-        out.push(TABLE[(byte >> 4) as usize] as char);
-        out.push(TABLE[(byte & 0x0f) as usize] as char);
-    }
-    out
 }
 
 #[cfg(test)]

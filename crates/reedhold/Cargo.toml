@@ -14,6 +14,7 @@ keywords = ["p2p", "protocol", "identity", "mesh", "social"]
 categories = ["cryptography", "network-programming"]
 
 [dependencies]
+reedhold-api.workspace = true
 reedhold-chain.workspace = true
 reedhold-client.workspace = true
 reedhold-codec.workspace = true

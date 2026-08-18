@@ -55,6 +55,16 @@
       "paths": ["crates/reedhold-client"]
     },
     {
+      "id": "api",
+      "name": "Sync host session for every UI and MCP",
+      "paths": ["crates/reedhold-api"]
+    },
+    {
+      "id": "mcp",
+      "name": "Agent MCP adapter",
+      "paths": ["crates/reedhold-mcp"]
+    },
+    {
       "id": "facade",
       "name": "Public crate surface",
       "paths": ["crates/reedhold"]
@@ -75,6 +85,8 @@
         "storage",
         "chain",
         "client",
+        "api",
+        "mcp",
         "facade"
       ],
       "kinds": ["imports", "re_exports", "depends_on"]
@@ -92,6 +104,8 @@
         "storage",
         "chain",
         "client",
+        "api",
+        "mcp",
         "facade"
       ],
       "kinds": ["imports", "re_exports", "depends_on"]
@@ -108,6 +122,8 @@
         "storage",
         "chain",
         "client",
+        "api",
+        "mcp",
         "facade"
       ],
       "kinds": ["imports", "re_exports", "depends_on"]
@@ -116,21 +132,21 @@
       "id": "recovery-does-not-see-events-or-network",
       "action": "forbid",
       "from": ["recovery"],
-      "to": ["event", "protocol", "mesh", "storage", "chain", "client", "facade"],
+      "to": ["event", "protocol", "mesh", "storage", "chain", "client", "api", "mcp", "facade"],
       "kinds": ["imports", "re_exports", "depends_on"]
     },
     {
       "id": "event-does-not-see-recovery-or-network",
       "action": "forbid",
       "from": ["event"],
-      "to": ["recovery", "protocol", "mesh", "storage", "chain", "client", "facade"],
+      "to": ["recovery", "protocol", "mesh", "storage", "chain", "client", "api", "mcp", "facade"],
       "kinds": ["imports", "re_exports", "depends_on"]
     },
     {
       "id": "protocol-does-not-own-network",
       "action": "forbid",
       "from": ["protocol"],
-      "to": ["mesh", "storage", "chain", "client", "facade"],
+      "to": ["mesh", "storage", "chain", "client", "api", "mcp", "facade"],
       "kinds": ["imports", "re_exports", "depends_on"]
     },
     {
@@ -146,6 +162,8 @@
         "storage",
         "chain",
         "client",
+        "api",
+        "mcp",
         "facade"
       ],
       "kinds": ["imports", "re_exports", "depends_on"]
@@ -163,6 +181,8 @@
         "mesh",
         "chain",
         "client",
+        "api",
+        "mcp",
         "facade"
       ],
       "kinds": ["imports", "re_exports", "depends_on"]
@@ -180,8 +200,42 @@
         "mesh",
         "storage",
         "client",
+        "api",
+        "mcp",
         "facade"
       ],
+      "kinds": ["imports", "re_exports", "depends_on"]
+    },
+    {
+      "id": "api-is-the-host-surface",
+      "action": "forbid",
+      "from": ["api"],
+      "to": ["mesh", "storage", "chain", "client", "mcp", "facade"],
+      "kinds": ["imports", "re_exports", "depends_on"]
+    },
+    {
+      "id": "mcp-only-talks-to-the-host-api",
+      "action": "forbid",
+      "from": ["mcp"],
+      "to": [
+        "mesh",
+        "storage",
+        "chain",
+        "client",
+        "facade",
+        "identity",
+        "protocol",
+        "recovery",
+        "event",
+        "codec"
+      ],
+      "kinds": ["imports", "re_exports", "depends_on"]
+    },
+    {
+      "id": "client-does-not-use-host-adapters",
+      "action": "forbid",
+      "from": ["client"],
+      "to": ["api", "mcp", "facade"],
       "kinds": ["imports", "re_exports", "depends_on"]
     },
     {
@@ -197,7 +251,9 @@
         "mesh",
         "storage",
         "chain",
-        "client"
+        "client",
+        "api",
+        "mcp"
       ],
       "to": ["facade"],
       "kinds": ["imports", "re_exports", "depends_on"]

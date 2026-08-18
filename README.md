@@ -6,9 +6,11 @@ Reedhold is a Rust protocol library for a social network that survives its
 creator: recoverable cryptographic identity, signed events, bounded clients,
 and state that does not live on a company server.
 
-This repository is the **protocol workspace**, not a consumer app. Clients for
-desktop, iOS, and Android will bind to these crates later. The intended
-security kernel is [Blindplane](https://github.com/sergii-ziborov/blindplane);
+This repository is the **protocol workspace**, not a consumer app. iOS
+(Swift), Android (Kotlin), Mac, Linux, and Windows all bind the same
+sync crate: `reedhold-api`. AI agents use the same session through
+`reedhold-mcp` (`mcport` + `blazingly-json`). The intended security
+kernel is [Blindplane](https://github.com/sergii-ziborov/blindplane);
 it stays a separate library.
 
 > Prototype. Not independently audited. Do not use for real secrets yet.
@@ -20,6 +22,8 @@ it stays a separate library.
 - signed social events
 - recovery manifests that can be stored on untrusted hosts
 - ports for mesh, storage, chain, and a bounded client
+- a sync host API that UI processes can wrap (no Tokio)
+- an MCP server so an agent can create, restore, emit, and verify
 
 ## What is not in this repo yet
 
@@ -41,12 +45,18 @@ crates/reedhold-mesh        discovery / transport ports
 crates/reedhold-storage     durability classes and node budgets
 crates/reedhold-chain       compact checkpoint types
 crates/reedhold-client      light-client profile
-crates/reedhold             public facade
+crates/reedhold-api         sync host session (Swift / Kotlin / desktop)
+crates/reedhold-mcp         MCP stdio binary `reedhold`
+crates/reedhold             public facade (does not include MCP)
 ```
 
 Layering is one-way. Mesh, storage, and chain do not depend on each other.
-The facade is the only crate that sees every layer. No crate depends on the
-facade.
+UIs and agents never import mesh. They import `reedhold-api`.
+The facade does not depend on MCP. No crate depends on the facade.
+
+```sh
+cargo run -p reedhold-mcp -- mcp
+```
 
 ## Build
 

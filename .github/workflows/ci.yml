@@ -28,3 +28,5 @@ jobs:
         run: cargo clippy --workspace --all-targets -- -D warnings
       - name: Test workspace
         run: cargo test --workspace --all-targets
+      - name: Binary identity
+        run: cargo run -p reedhold-mcp -- --version

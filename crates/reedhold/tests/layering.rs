@@ -3,117 +3,65 @@
 use std::fs;
 use std::path::PathBuf;
 
-const FORBIDDEN: &[(&str, &[&str])] = &[
-    (
-        "reedhold-core",
-        &[
-            "reedhold-codec",
-            "reedhold-identity",
-            "reedhold-recovery",
-            "reedhold-event",
-            "reedhold-protocol",
-            "reedhold-mesh",
-            "reedhold-storage",
-            "reedhold-chain",
-            "reedhold-client",
-            "reedhold",
-        ],
-    ),
-    (
-        "reedhold-codec",
-        &[
-            "reedhold-identity",
-            "reedhold-protocol",
-            "reedhold-mesh",
-            "reedhold-client",
-            "reedhold",
-        ],
-    ),
-    (
-        "reedhold-identity",
-        &[
-            "reedhold-recovery",
-            "reedhold-event",
-            "reedhold-protocol",
-            "reedhold-mesh",
-            "reedhold-client",
-            "reedhold",
-        ],
-    ),
-    (
-        "reedhold-recovery",
-        &[
-            "reedhold-event",
-            "reedhold-protocol",
-            "reedhold-mesh",
-            "reedhold-client",
-            "reedhold",
-        ],
-    ),
-    (
-        "reedhold-event",
-        &[
-            "reedhold-recovery",
-            "reedhold-protocol",
-            "reedhold-mesh",
-            "reedhold-client",
-            "reedhold",
-        ],
-    ),
-    (
-        "reedhold-protocol",
-        &[
-            "reedhold-mesh",
-            "reedhold-storage",
-            "reedhold-chain",
-            "reedhold-client",
-            "reedhold",
-        ],
-    ),
-    (
-        "reedhold-mesh",
-        &[
-            "reedhold-codec",
-            "reedhold-identity",
-            "reedhold-protocol",
-            "reedhold-storage",
-            "reedhold-chain",
-            "reedhold-client",
-            "reedhold",
-        ],
-    ),
-    (
-        "reedhold-storage",
-        &[
-            "reedhold-codec",
-            "reedhold-identity",
-            "reedhold-protocol",
-            "reedhold-mesh",
-            "reedhold-chain",
-            "reedhold-client",
-            "reedhold",
-        ],
-    ),
-    (
-        "reedhold-chain",
-        &[
-            "reedhold-codec",
-            "reedhold-identity",
-            "reedhold-protocol",
-            "reedhold-mesh",
-            "reedhold-storage",
-            "reedhold-client",
-            "reedhold",
-        ],
-    ),
+const HOSTS: &[&str] = &["reedhold-api", "reedhold-mcp"];
+const NETWORK: &[&str] = &[
+    "reedhold-mesh",
+    "reedhold-storage",
+    "reedhold-chain",
+    "reedhold-client",
 ];
 
 #[test]
 fn crate_manifests_respect_the_layering() {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
-    for (crate_name, forbidden) in FORBIDDEN {
-        assert_no_dep(&root, crate_name, forbidden);
+    for crate_name in [
+        "reedhold-core",
+        "reedhold-codec",
+        "reedhold-identity",
+        "reedhold-recovery",
+        "reedhold-event",
+        "reedhold-protocol",
+        "reedhold-mesh",
+        "reedhold-storage",
+        "reedhold-chain",
+        "reedhold-client",
+        "reedhold-api",
+        "reedhold-mcp",
+    ] {
+        assert_no_dep(&root, crate_name, &["reedhold"]);
     }
+    for crate_name in [
+        "reedhold-core",
+        "reedhold-codec",
+        "reedhold-identity",
+        "reedhold-recovery",
+        "reedhold-event",
+        "reedhold-protocol",
+        "reedhold-mesh",
+        "reedhold-storage",
+        "reedhold-chain",
+        "reedhold-client",
+    ] {
+        assert_no_dep(&root, crate_name, HOSTS);
+    }
+    assert_no_dep(&root, "reedhold-protocol", NETWORK);
+    assert_no_dep(&root, "reedhold-api", NETWORK);
+    assert_no_dep(&root, "reedhold-api", &["reedhold-mcp"]);
+    assert_no_dep(
+        &root,
+        "reedhold-mcp",
+        &[
+            "reedhold-mesh",
+            "reedhold-storage",
+            "reedhold-chain",
+            "reedhold-client",
+            "reedhold-identity",
+            "reedhold-protocol",
+            "reedhold-recovery",
+            "reedhold-event",
+            "reedhold-codec",
+        ],
+    );
 }
 
 fn assert_no_dep(root: &std::path::Path, crate_name: &str, forbidden: &[&str]) {

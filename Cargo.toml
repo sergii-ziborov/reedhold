@@ -2,12 +2,14 @@
 resolver = "3"
 members = [
     "crates/reedhold",
+    "crates/reedhold-api",
     "crates/reedhold-chain",
     "crates/reedhold-client",
     "crates/reedhold-codec",
     "crates/reedhold-core",
     "crates/reedhold-event",
     "crates/reedhold-identity",
+    "crates/reedhold-mcp",
     "crates/reedhold-mesh",
     "crates/reedhold-protocol",
     "crates/reedhold-recovery",
@@ -27,18 +29,23 @@ publish = false
 
 [workspace.dependencies]
 reedhold = { version = "0.1.0", path = "crates/reedhold" }
+reedhold-api = { version = "0.1.0", path = "crates/reedhold-api" }
 reedhold-chain = { version = "0.1.0", path = "crates/reedhold-chain" }
 reedhold-client = { version = "0.1.0", path = "crates/reedhold-client" }
 reedhold-codec = { version = "0.1.0", path = "crates/reedhold-codec" }
 reedhold-core = { version = "0.1.0", path = "crates/reedhold-core" }
 reedhold-event = { version = "0.1.0", path = "crates/reedhold-event" }
 reedhold-identity = { version = "0.1.0", path = "crates/reedhold-identity" }
+reedhold-mcp = { version = "0.1.0", path = "crates/reedhold-mcp" }
 reedhold-mesh = { version = "0.1.0", path = "crates/reedhold-mesh" }
 reedhold-protocol = { version = "0.1.0", path = "crates/reedhold-protocol" }
 reedhold-recovery = { version = "0.1.0", path = "crates/reedhold-recovery" }
 reedhold-storage = { version = "0.1.0", path = "crates/reedhold-storage" }
 
 argon2 = { version = "0.5.3", default-features = false, features = ["alloc"] }
+blazingly-json = "0.1.5"
+mcport = "0.5.0"
+serde = { version = "1.0.229", default-features = false, features = ["alloc", "derive"] }
 chacha20poly1305 = { version = "0.10.1", default-features = false, features = ["alloc", "getrandom"] }
 ed25519-dalek = { version = "2.2.0", default-features = false, features = ["std"] }
 getrandom = "0.2.16"

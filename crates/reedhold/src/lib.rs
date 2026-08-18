@@ -5,6 +5,7 @@
 #![forbid(unsafe_code)]
 #![doc = include_str!("../../../README.md")]
 
+pub use reedhold_api as api;
 pub use reedhold_chain as chain;
 pub use reedhold_client as client;
 pub use reedhold_codec as codec;
@@ -16,6 +17,7 @@ pub use reedhold_protocol as protocol;
 pub use reedhold_recovery as recovery;
 pub use reedhold_storage as storage;
 
+pub use reedhold_api::{AccountView, EventView, ManifestView, Session};
 pub use reedhold_core::{
     ContentId, DeviceId, Digest32, DomainTag, Error, IdentityId, NetworkId, PROTOCOL_NAME,
     PROTOCOL_VERSION, Result,

@@ -2,6 +2,7 @@
 
 use crate::account::Account;
 use reedhold_core::{Error, Result};
+use reedhold_identity::DeviceGrant;
 use reedhold_recovery::{RecoveryManifest, unseal_seed};
 
 /// Unlock a manifest with `password` and rebuild the live account.
@@ -21,7 +22,15 @@ pub fn restore_account(
         return Err(Error::Recovery("unsealed identity does not match manifest"));
     }
     let device = bundle.devices.device_keys(device_secret)?;
-    Ok(Account::new(seed, bundle, device, manifest.network))
+    let grant = DeviceGrant::issue(&bundle.root, &device, 1);
+    Ok(Account::new(
+        seed,
+        bundle,
+        device,
+        grant,
+        manifest.network,
+        manifest.clone(),
+    ))
 }
 
 #[cfg(test)]
@@ -52,10 +61,8 @@ mod tests {
     fn password_change_does_not_change_identity() {
         let created = create_account(NetworkId::DEV, b"old", &[2_u8; 32], KdfParams::TEST).unwrap();
         let identity = created.account.identity();
-        let rotated = created
-            .account
-            .change_password(b"new", 2, KdfParams::TEST)
-            .unwrap();
+        let mut account = created.account;
+        let rotated = account.change_password(b"new", KdfParams::TEST).unwrap();
         let restored = restore_account(&rotated, b"new", &[2_u8; 32]).unwrap();
         assert_eq!(restored.identity(), identity);
         assert!(restore_account(&rotated, b"old", &[2_u8; 32]).is_err());

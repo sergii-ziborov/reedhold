@@ -1,10 +1,9 @@
 //! Random master seed. Never derived from a password.
 
-use crate::derive::{digest, expand};
 use crate::device::DeviceAuthority;
+use crate::root::IdentityRoot;
 use core::fmt;
-use ed25519_dalek::SigningKey;
-use reedhold_core::{DomainTag, Error, IdentityId, Result};
+use reedhold_core::{Error, Result};
 
 /// 256-bit account root. Losing it without a recovery vault loses the account.
 pub struct MasterSeed([u8; 32]);
@@ -39,14 +38,11 @@ impl MasterSeed {
     ///
     /// Returns [`Error::Identity`] when HKDF expansion fails.
     pub fn unlock(&self) -> Result<IdentityBundle> {
-        let identity_secret = expand(&self.0, DomainTag::IdentityRoot)?;
-        let signing = SigningKey::from_bytes(&identity_secret);
-        let public = signing.verifying_key().to_bytes();
-        let identity = IdentityId::from_digest(digest(DomainTag::Identity, &public));
+        let root = IdentityRoot::derive(&self.0)?;
         let devices = DeviceAuthority::derive(&self.0)?;
         Ok(IdentityBundle {
-            identity,
-            root_public: public,
+            identity: root.identity,
+            root,
             devices,
         })
     }
@@ -58,13 +54,13 @@ impl fmt::Debug for MasterSeed {
     }
 }
 
-/// Public account material derived from a seed. Contains no master secret.
+/// Derived account material. Holds the identity-root key, not the master seed.
 #[derive(Clone, Debug)]
 pub struct IdentityBundle {
     /// Permanent network identifier.
-    pub identity: IdentityId,
-    /// Ed25519 public key of the identity root.
-    pub root_public: [u8; 32],
+    pub identity: reedhold_core::IdentityId,
+    /// Root signer used for device grants.
+    pub root: IdentityRoot,
     /// Device authorization derived from the same seed.
     pub devices: DeviceAuthority,
 }
