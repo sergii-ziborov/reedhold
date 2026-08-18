@@ -1,0 +1,29 @@
+[package]
+name = "reedhold"
+description = "Reedhold protocol facade: recoverable social mesh primitives"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+readme = "../../README.md"
+publish.workspace = true
+keywords = ["p2p", "protocol", "identity", "mesh", "social"]
+categories = ["cryptography", "network-programming"]
+
+[dependencies]
+reedhold-chain.workspace = true
+reedhold-client.workspace = true
+reedhold-codec.workspace = true
+reedhold-core.workspace = true
+reedhold-event.workspace = true
+reedhold-identity.workspace = true
+reedhold-mesh.workspace = true
+reedhold-protocol.workspace = true
+reedhold-recovery.workspace = true
+reedhold-storage.workspace = true
+
+[lints]
+workspace = true

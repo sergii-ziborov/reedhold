@@ -1,0 +1,17 @@
+[package]
+name = "reedhold-chain"
+description = "Compact Reedhold checkpoints: roots and finality, not messages"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+publish.workspace = true
+
+[dependencies]
+reedhold-core.workspace = true
+
+[lints]
+workspace = true

@@ -1,0 +1,21 @@
+[package]
+name = "reedhold-event"
+description = "Signed Reedhold social events"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+publish.workspace = true
+
+[dependencies]
+ed25519-dalek.workspace = true
+reedhold-codec.workspace = true
+reedhold-core.workspace = true
+reedhold-identity.workspace = true
+sha2.workspace = true
+
+[lints]
+workspace = true

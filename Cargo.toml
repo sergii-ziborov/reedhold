@@ -1,0 +1,59 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/reedhold",
+    "crates/reedhold-chain",
+    "crates/reedhold-client",
+    "crates/reedhold-codec",
+    "crates/reedhold-core",
+    "crates/reedhold-event",
+    "crates/reedhold-identity",
+    "crates/reedhold-mesh",
+    "crates/reedhold-protocol",
+    "crates/reedhold-recovery",
+    "crates/reedhold-storage",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+license = "MIT"
+authors = ["Sergii Ziborov <sergii@edgehawk.io>"]
+repository = "https://github.com/sergii-ziborov/reedhold"
+homepage = "https://github.com/sergii-ziborov/reedhold"
+readme = "README.md"
+publish = false
+
+[workspace.dependencies]
+reedhold = { version = "0.1.0", path = "crates/reedhold" }
+reedhold-chain = { version = "0.1.0", path = "crates/reedhold-chain" }
+reedhold-client = { version = "0.1.0", path = "crates/reedhold-client" }
+reedhold-codec = { version = "0.1.0", path = "crates/reedhold-codec" }
+reedhold-core = { version = "0.1.0", path = "crates/reedhold-core" }
+reedhold-event = { version = "0.1.0", path = "crates/reedhold-event" }
+reedhold-identity = { version = "0.1.0", path = "crates/reedhold-identity" }
+reedhold-mesh = { version = "0.1.0", path = "crates/reedhold-mesh" }
+reedhold-protocol = { version = "0.1.0", path = "crates/reedhold-protocol" }
+reedhold-recovery = { version = "0.1.0", path = "crates/reedhold-recovery" }
+reedhold-storage = { version = "0.1.0", path = "crates/reedhold-storage" }
+
+argon2 = { version = "0.5.3", default-features = false, features = ["alloc"] }
+chacha20poly1305 = { version = "0.10.1", default-features = false, features = ["alloc", "getrandom"] }
+ed25519-dalek = { version = "2.2.0", default-features = false, features = ["std"] }
+getrandom = "0.2.16"
+hkdf = "0.12.4"
+sha2 = { version = "0.10.9", default-features = false }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = "symbols"

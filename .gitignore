@@ -1,0 +1,30 @@
+/target/
+**/*.rs.bk
+Cargo.lock.bak
+
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Local working notes — never published
+.local/
+/PLAN.md
+/ROADMAP.md
+/NOTES.md
+/TODO.md
+*.plan.md
+docs/plan/
+docs/roadmap/
+docs/private/
+
+# Coverage and scratch
+coverage/
+lcov.info
+*.profraw
+*.profdata
+/tmp/
+/scratch/

@@ -1,0 +1,2 @@
+doc-valid-idents = ["Reedhold", "Blindplane", "HKDF", "Argon2id", "Ed25519", "XChaCha20", ".."]
+cognitive-complexity-threshold = 20
