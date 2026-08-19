@@ -42,6 +42,11 @@ separate library.
 - a late peer joins a running fabric instead of rebuilding it, because a rebuild
   drops every relay queue and loses mail nobody has collected yet
 - public nicknames are aliases only: they are not identity and never enter signed talk bytes
+- a released nick is retired for a year, so a stranger cannot inherit the name
+  people knew you by; a contact records the nick you had, and a later rename
+  shows as "@bob, was @alice"
+- privacy is a session policy, not a transport rule: who may write to you,
+  blocked identities, archived conversations, and a requests tray for strangers
 - public topic rooms: slug is a local label; posts carry identity hex
 - owner-admin groups: invite and remove rotate the epoch key
 - Reed-Solomon durable objects: 4-of-6, survive a third of holders, then repair
