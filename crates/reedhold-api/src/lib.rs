@@ -3,6 +3,7 @@
 #![forbid(unsafe_code)]
 
 mod ads;
+mod chain;
 mod durable;
 mod inbox;
 mod mesh;
@@ -14,6 +15,7 @@ mod talk;
 mod view;
 
 pub use ads::{AdvertisingLimitsView, advertising_limits};
+pub use chain::{ChainSession, HeaderView, ProofView};
 pub use durable::{DurableSession, ObjectView};
 pub use inbox::{CircleView, TalkView};
 pub use mesh::{MeshSession, RouteView};

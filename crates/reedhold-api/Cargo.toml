@@ -13,6 +13,7 @@ publish.workspace = true
 [dependencies]
 blazingly-json.workspace = true
 reedhold-ads.workspace = true
+reedhold-chain.workspace = true
 reedhold-core.workspace = true
 reedhold-event.workspace = true
 reedhold-mesh.workspace = true

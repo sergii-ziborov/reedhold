@@ -1,8 +1,12 @@
 //! Split MCP catalog so no function exceeds the 100-line budget.
 
 use crate::host::Host;
-use crate::schema::{combine_schema, holders_schema, object_schema, sync_plan_schema};
+use crate::schema::{
+    chain_commit_schema, chain_prove_schema, chain_verify_schema, combine_schema, holders_schema,
+    object_schema, sync_plan_schema,
+};
 use crate::tools;
+use crate::tools_chain;
 use crate::tools_durable;
 use crate::tools_mesh;
 use crate::tools_store;
@@ -228,5 +232,45 @@ pub(crate) fn with_talk(server: McpServer<Host>) -> McpServer<Host> {
             "Drain and decrypt talk for the unlocked identity.",
             object_schema(&[]),
             tools_talk::talk_inbox,
+        )
+}
+
+pub(crate) fn with_chain(server: McpServer<Host>) -> McpServer<Host> {
+    server
+        .tool_with_state(
+            "chain_open",
+            "Open a compact header chain. No message bytes are stored.",
+            object_schema(&[]),
+            tools_chain::chain_open,
+        )
+        .tool_with_state(
+            "chain_commit",
+            "Commit identity/group/storage Merkle roots for this epoch.",
+            chain_commit_schema(),
+            tools_chain::chain_commit,
+        )
+        .tool_with_state(
+            "chain_head",
+            "Show the latest compact header the light client follows.",
+            object_schema(&[]),
+            tools_chain::chain_head,
+        )
+        .tool_with_state(
+            "chain_headers",
+            "Recent headers only. The phone does not store the full chain.",
+            object_schema(&[]),
+            tools_chain::chain_headers,
+        )
+        .tool_with_state(
+            "chain_prove",
+            "Prove one 32-byte head is in a Merkle subtree root.",
+            chain_prove_schema(),
+            tools_chain::chain_prove,
+        )
+        .tool_with_state(
+            "chain_verify",
+            "Verify a compact inclusion proof. Rejects a stranger leaf.",
+            chain_verify_schema(),
+            tools_chain::chain_verify,
         )
 }

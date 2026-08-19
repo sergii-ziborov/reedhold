@@ -37,6 +37,12 @@ pub enum DomainTag {
     TalkGroup,
     /// Local seal for the persisted group book.
     CircleBook,
+    /// Combined epoch state root.
+    ChainState,
+    /// Canonical chain header hash.
+    ChainHeader,
+    /// Merkle node / leaf for a checkpoint subtree.
+    ChainMerkle,
 }
 
 impl DomainTag {
@@ -58,6 +64,9 @@ impl DomainTag {
             Self::TalkPair => "reedhold/talk-pair/v1",
             Self::TalkGroup => "reedhold/talk-group/v1",
             Self::CircleBook => "reedhold/circle-book/v1",
+            Self::ChainState => "reedhold/chain-state/v1",
+            Self::ChainHeader => "reedhold/chain-header/v1",
+            Self::ChainMerkle => "reedhold/chain-merkle/v1",
         }
     }
 
@@ -89,6 +98,9 @@ mod tests {
             DomainTag::TalkPair,
             DomainTag::TalkGroup,
             DomainTag::CircleBook,
+            DomainTag::ChainState,
+            DomainTag::ChainHeader,
+            DomainTag::ChainMerkle,
         ]
         .map(DomainTag::as_str);
         for (index, label) in labels.iter().enumerate() {

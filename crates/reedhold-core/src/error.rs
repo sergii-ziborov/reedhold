@@ -17,6 +17,8 @@ pub enum Error {
     Mesh(&'static str),
     /// Durable storage, erasure, or quota failed.
     Storage(&'static str),
+    /// Compact chain header or proof failed.
+    Chain(&'static str),
     /// Operating-system entropy was unavailable.
     Entropy,
 }
@@ -30,6 +32,7 @@ impl fmt::Display for Error {
             Self::Event(reason) => write!(formatter, "event: {reason}"),
             Self::Mesh(reason) => write!(formatter, "mesh: {reason}"),
             Self::Storage(reason) => write!(formatter, "storage: {reason}"),
+            Self::Chain(reason) => write!(formatter, "chain: {reason}"),
             Self::Entropy => formatter.write_str("system entropy unavailable"),
         }
     }

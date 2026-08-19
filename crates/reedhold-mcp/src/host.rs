@@ -1,7 +1,8 @@
 //! One in-memory session for the agent process.
 
 use reedhold_api::{
-    AccountView, DurableSession, EventView, ManifestView, MeshSession, Session, TalkNet,
+    AccountView, ChainSession, DurableSession, EventView, ManifestView, MeshSession, Session,
+    TalkNet,
 };
 use reedhold_core::{Error, Result};
 
@@ -12,6 +13,7 @@ pub struct Host {
     pub(crate) mesh: Option<MeshSession>,
     pub(crate) durable: Option<DurableSession>,
     pub(crate) talk: Option<TalkNet>,
+    pub(crate) chain: Option<ChainSession>,
 }
 
 impl Host {

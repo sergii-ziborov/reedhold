@@ -19,4 +19,5 @@ pub const INVARIANTS: &[&str] = &[
     "outsiders_cannot_read_talk",
     "small_groups_are_not_mls_yet",
     "removed_member_cannot_read_new_epoch",
+    "light_client_header_window_is_bounded",
 ];

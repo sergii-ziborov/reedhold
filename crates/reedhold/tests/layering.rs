@@ -49,11 +49,7 @@ fn crate_manifests_respect_the_layering() {
         assert_no_dep(&root, crate_name, HOSTS);
     }
     assert_no_dep(&root, "reedhold-protocol", NETWORK);
-    assert_no_dep(
-        &root,
-        "reedhold-api",
-        &["reedhold-chain", "reedhold-client", "reedhold-mcp"],
-    );
+    assert_no_dep(&root, "reedhold-api", &["reedhold-client", "reedhold-mcp"]);
     assert_no_dep(&root, "reedhold-ads", NETWORK);
     assert_no_dep(
         &root,

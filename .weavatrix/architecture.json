@@ -202,7 +202,6 @@
       "action": "forbid",
       "from": ["chain"],
       "to": [
-        "codec",
         "identity",
         "recovery",
         "event",
@@ -227,7 +226,7 @@
       "id": "api-is-the-host-surface",
       "action": "forbid",
       "from": ["api"],
-      "to": ["chain", "client", "mcp", "facade"],
+      "to": ["client", "mcp", "facade"],
       "kinds": ["imports", "re_exports", "depends_on"]
     },
     {

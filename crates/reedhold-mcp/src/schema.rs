@@ -68,3 +68,43 @@ pub(crate) fn combine_schema() -> Value {
         "additionalProperties": false
     })
 }
+
+pub(crate) fn chain_commit_schema() -> Value {
+    json!({
+        "type": "object",
+        "properties": {
+            "epoch": { "type": "string" },
+            "identity": { "type": "string" },
+            "groups": { "type": "string" },
+            "storage": { "type": "string" }
+        },
+        "required": ["epoch"],
+        "additionalProperties": false
+    })
+}
+
+pub(crate) fn chain_prove_schema() -> Value {
+    json!({
+        "type": "object",
+        "properties": {
+            "leaves": { "type": "array", "items": { "type": "string" } },
+            "index": { "type": "string" }
+        },
+        "required": ["leaves", "index"],
+        "additionalProperties": false
+    })
+}
+
+pub(crate) fn chain_verify_schema() -> Value {
+    json!({
+        "type": "object",
+        "properties": {
+            "leaf": { "type": "string" },
+            "root": { "type": "string" },
+            "index": { "type": "string" },
+            "siblings": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["leaf", "root", "index", "siblings"],
+        "additionalProperties": false
+    })
+}
