@@ -23,6 +23,7 @@ pub struct Session {
     pub(crate) circles: BTreeMap<ConversationId, Circle>,
     pubs: BTreeMap<IdentityId, [u8; 32]>,
     pub(crate) contacts: BTreeMap<IdentityId, crate::contacts::ContactEntry>,
+    threads: BTreeMap<String, Vec<crate::inbox::TalkView>>,
 }
 
 impl Session {
@@ -138,7 +139,33 @@ impl Session {
             circles: BTreeMap::new(),
             pubs: BTreeMap::new(),
             contacts: BTreeMap::new(),
+            threads: BTreeMap::new(),
         }
+    }
+
+    /// Every conversation this session can read, sent and received alike.
+    ///
+    /// A sender keeps no copy in the mesh — the fabric only carries mail to
+    /// other people. Without this the author of a message cannot reread it.
+    #[must_use]
+    pub fn threads(&self) -> BTreeMap<String, Vec<crate::inbox::TalkView>> {
+        self.threads.clone()
+    }
+
+    /// One conversation, oldest first.
+    #[must_use]
+    pub fn thread(&self, conversation_hex: &str) -> Vec<crate::inbox::TalkView> {
+        self.threads
+            .get(conversation_hex)
+            .cloned()
+            .unwrap_or_default()
+    }
+
+    pub(crate) fn record_talk(&mut self, view: crate::inbox::TalkView) {
+        self.threads
+            .entry(view.conversation.clone())
+            .or_default()
+            .push(view);
     }
 
     /// Identity digest hex. The in-process talk net uses this as the peer id.

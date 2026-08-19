@@ -55,6 +55,16 @@ impl MeshSession {
         })
     }
 
+    /// Admit a late peer without rebuilding the fabric.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Codec`] when the hex id is invalid.
+    pub fn admit(&mut self, peer_hex: &str) -> Result<()> {
+        self.fabric.admit(PeerId::from_hex(peer_hex)?);
+        Ok(())
+    }
+
     /// Bring a peer online and deliver waiting mail.
     ///
     /// # Errors

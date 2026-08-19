@@ -33,6 +33,15 @@ impl Fabric {
         }
     }
 
+    /// Let a peer join a running fabric. Held mail is kept.
+    ///
+    /// A newcomer must never cost the network its undelivered mail, so this
+    /// is the only way to grow the peer set: rebuilding the fabric drops
+    /// every relay queue and every inbox.
+    pub fn admit(&mut self, peer: PeerId) {
+        self.nodes.entry(peer).or_default();
+    }
+
     /// Mark a peer reachable.
     ///
     /// # Errors

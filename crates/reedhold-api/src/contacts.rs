@@ -14,6 +14,11 @@ pub struct ContactView {
     pub messaging_public: String,
     /// Local label. Empty if unset. Not an alias, not in crypto.
     pub petname: String,
+    /// Deterministic DM conversation hex with this contact.
+    ///
+    /// A transcript is keyed by conversation, never by identity. Clients that
+    /// guess the key silently show an empty chat.
+    pub conversation: String,
 }
 
 #[derive(Clone, Debug)]
@@ -41,7 +46,7 @@ impl Session {
             messaging_public: public,
             petname: petname.trim().to_owned(),
         };
-        let view = contact_view(id, &entry);
+        let view = contact_view_with(self.account.identity(), id, &entry);
         self.contacts.insert(id, entry);
         Ok(view)
     }
@@ -62,9 +67,10 @@ impl Session {
     /// Local book, sorted by identity hex.
     #[must_use]
     pub fn contacts(&self) -> Vec<ContactView> {
+        let me = self.account.identity();
         self.contacts
             .iter()
-            .map(|(id, entry)| contact_view(*id, entry))
+            .map(|(id, entry)| contact_view_with(me, *id, entry))
             .collect()
     }
 
@@ -79,11 +85,12 @@ impl Session {
     }
 }
 
-fn contact_view(id: IdentityId, entry: &ContactEntry) -> ContactView {
+fn contact_view_with(me: IdentityId, id: IdentityId, entry: &ContactEntry) -> ContactView {
     ContactView {
         identity: id.to_hex(),
         messaging_public: reedhold_core::encode_hex(&entry.messaging_public),
         petname: entry.petname.clone(),
+        conversation: reedhold_event::dm_conversation(me, id).to_hex(),
     }
 }
 

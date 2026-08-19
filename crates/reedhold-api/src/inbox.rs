@@ -161,6 +161,56 @@ mod tests {
     }
 
     #[test]
+    fn the_author_can_reread_what_they_sent() {
+        let mut alice = handset(40);
+        let bob = handset(41);
+        let extras: Vec<String> = (50_u8..=56).map(secret).collect();
+        let mut candidates = vec![alice.peer_hex(), bob.peer_hex()];
+        candidates.extend(extras);
+        let mut talk = TalkNet::open(9, &secret(0), &candidates, None, Some(2)).unwrap();
+        talk.online(&alice.peer_hex()).unwrap();
+        talk.online(&bob.peer_hex()).unwrap();
+
+        let conversation =
+            crate::talk::dm_conversation_hex(&alice.peer_hex(), &bob.peer_hex()).unwrap();
+        talk.dm(
+            &mut alice,
+            &bob.peer_hex(),
+            &bob.view().messaging_public,
+            "mine",
+        )
+        .unwrap();
+        assert_eq!(alice.thread(&conversation)[0].text, "mine");
+
+        let solo = talk.create_circle(&mut alice, "solo").unwrap();
+        talk.send_circle(&mut alice, &solo.id, "alone").unwrap();
+        assert_eq!(alice.thread(&solo.id)[0].text, "alone");
+    }
+
+    #[test]
+    fn a_newcomer_does_not_erase_mail_in_flight() {
+        let mut alice = handset(42);
+        let mut bob = handset(43);
+        let late = handset(44);
+        let extras: Vec<String> = (60_u8..=66).map(secret).collect();
+        let mut candidates = vec![alice.peer_hex(), bob.peer_hex()];
+        candidates.extend(extras);
+        let mut talk = TalkNet::open(10, &secret(0), &candidates, None, Some(2)).unwrap();
+        talk.online(&alice.peer_hex()).unwrap();
+        talk.dm(
+            &mut alice,
+            &bob.peer_hex(),
+            &bob.view().messaging_public,
+            "held for bob",
+        )
+        .unwrap();
+        talk.admit(&late.peer_hex()).unwrap();
+        talk.online(&late.peer_hex()).unwrap();
+        talk.online(&bob.peer_hex()).unwrap();
+        assert_eq!(talk.inbox(&mut bob).unwrap()[0].text, "held for bob");
+    }
+
+    #[test]
     fn small_group_invite_then_message() {
         let mut alice = handset(3);
         let mut bob = handset(4);

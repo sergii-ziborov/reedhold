@@ -90,11 +90,23 @@ impl TalkNet {
             from.account.identity(),
             to,
         )?;
+        let conversation = dm_conversation(from.account.identity(), to);
         let body = TalkBody {
-            conversation: dm_conversation(from.account.identity(), to),
+            conversation,
             envelope: seal_message(&key, text.as_bytes())?,
         };
-        self.dispatch(from, to_hex, EventKind::DirectMessage, &body)
+        let route = self.dispatch(from, to_hex, EventKind::DirectMessage, &body)?;
+        keep_own(from, EventKind::DirectMessage, conversation, text);
+        Ok(route)
+    }
+
+    /// Admit a peer that joined after this net opened. Mail is kept.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Codec`] when the hex id is invalid.
+    pub fn admit(&mut self, peer_hex: &str) -> Result<()> {
+        self.mesh.admit(peer_hex)
     }
 
     /// Create a small group. The epoch key stays on this session.
@@ -201,6 +213,7 @@ impl TalkNet {
         for member in members {
             routes.push(self.dispatch(from, &member.to_hex(), EventKind::GroupMessage, &body)?);
         }
+        keep_own(from, EventKind::GroupMessage, group, text);
         Ok(routes)
     }
 
@@ -213,6 +226,7 @@ impl TalkNet {
         let mut out = Vec::new();
         for item in self.mesh.drain(&session.peer_hex())? {
             if let Ok(view) = ingest_one(session, &item) {
+                session.record_talk(view.clone());
                 out.push(view);
             }
         }
@@ -239,6 +253,17 @@ impl TalkNet {
         self.mesh
             .send(&from.peer_hex(), to_hex, &encode_hex(&packet.encode()?))
     }
+}
+
+/// Keep the author's own copy. The fabric only carries mail to other people.
+fn keep_own(from: &mut Session, kind: EventKind, conversation: ConversationId, text: &str) {
+    let author = from.account.identity().to_hex();
+    from.record_talk(TalkView {
+        kind: kind.as_str().to_owned(),
+        conversation: conversation.to_hex(),
+        from: author,
+        text: text.to_owned(),
+    });
 }
 
 fn wrap_invite(owner: &Session, group: ConversationId, member: IdentityId) -> Result<TalkBody> {
