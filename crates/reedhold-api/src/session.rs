@@ -22,6 +22,7 @@ pub struct Session {
     pub(crate) log: Vec<StoredEvent>,
     pub(crate) circles: BTreeMap<ConversationId, Circle>,
     pubs: BTreeMap<IdentityId, [u8; 32]>,
+    pub(crate) contacts: BTreeMap<IdentityId, crate::contacts::ContactEntry>,
 }
 
 impl Session {
@@ -136,6 +137,7 @@ impl Session {
             log,
             circles: BTreeMap::new(),
             pubs: BTreeMap::new(),
+            contacts: BTreeMap::new(),
         }
     }
 

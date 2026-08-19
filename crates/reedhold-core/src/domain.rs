@@ -43,6 +43,8 @@ pub enum DomainTag {
     ChainHeader,
     /// Merkle node / leaf for a checkpoint subtree.
     ChainMerkle,
+    /// Public topic-room id. The human slug never appears on the wire.
+    PublicRoom,
 }
 
 impl DomainTag {
@@ -67,6 +69,7 @@ impl DomainTag {
             Self::ChainState => "reedhold/chain-state/v1",
             Self::ChainHeader => "reedhold/chain-header/v1",
             Self::ChainMerkle => "reedhold/chain-merkle/v1",
+            Self::PublicRoom => "reedhold/public-room/v1",
         }
     }
 
@@ -101,6 +104,7 @@ mod tests {
             DomainTag::ChainState,
             DomainTag::ChainHeader,
             DomainTag::ChainMerkle,
+            DomainTag::PublicRoom,
         ]
         .map(DomainTag::as_str);
         for (index, label) in labels.iter().enumerate() {

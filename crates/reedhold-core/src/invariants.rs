@@ -29,4 +29,7 @@ pub const INVARIANTS: &[&str] = &[
     "credits_are_transferable",
     "contribution_history_is_not_transferable",
     "popularity_is_not_consensus",
+    "alias_is_not_identity",
+    "alias_is_not_in_crypto",
+    "public_room_carries_no_alias",
 ];

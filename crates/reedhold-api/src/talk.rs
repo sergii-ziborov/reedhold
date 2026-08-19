@@ -12,6 +12,15 @@ pub struct TalkNet {
     mesh: MeshSession,
 }
 
+/// Deterministic DM conversation hex. Alias-free.
+///
+/// # Errors
+///
+/// Returns [`Error::Codec`] when a hex id is invalid.
+pub fn dm_conversation_hex(left: &str, right: &str) -> Result<String> {
+    Ok(dm_conversation(IdentityId::from_hex(left)?, IdentityId::from_hex(right)?).to_hex())
+}
+
 impl TalkNet {
     /// Same lottery as [`MeshSession::open`].
     ///

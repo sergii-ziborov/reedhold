@@ -36,6 +36,9 @@ separate library.
 - genesis advertising token: market rights only, not network control
 - in-process mesh fabric: direct, rotating-relay store-and-forward
 - DMs and small groups: pairwise X25519, shared epoch keys, leave rotates the key
+- public nicknames are aliases only: they are not identity and never enter signed talk bytes
+- public topic rooms: slug is a local label; posts carry identity hex
+- owner-admin groups: invite and remove rotate the epoch key
 - Reed-Solomon durable objects: 4-of-6, survive a third of holders, then repair
 - compact chain headers: identity/group/storage Merkle roots, 64-header light window, no message bytes
 - reputation v0: likes mature, cluster pumps are cheap, influence budget, not transferable

@@ -19,6 +19,8 @@ pub struct CircleView {
     pub name: String,
     /// Member identity hexes.
     pub members: Vec<String>,
+    /// True when this session is the owner-admin.
+    pub you_admin: bool,
 }
 
 /// One decrypted inbox item.
@@ -102,12 +104,17 @@ fn utf8(bytes: &[u8]) -> Result<String> {
 }
 
 pub(crate) fn circle_view(circle: &Circle) -> CircleView {
+    circle_view_as(circle, circle.owner)
+}
+
+pub(crate) fn circle_view_as(circle: &Circle, me: IdentityId) -> CircleView {
     CircleView {
         id: circle.id.to_hex(),
         owner: circle.owner.to_hex(),
         epoch: circle.epoch,
         name: circle.name.clone(),
         members: circle.members.iter().map(|id| id.to_hex()).collect(),
+        you_admin: circle.owner == me,
     }
 }
 
