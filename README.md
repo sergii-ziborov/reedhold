@@ -2,45 +2,79 @@
 
 A social mesh that keeps holding.
 
-Reedhold is a Rust protocol library for a social network that survives its
+Reedhold is a Rust **protocol library** for a social network that survives its
 creator: recoverable cryptographic identity, signed events, bounded clients,
 and state that does not live on a company server.
 
-This repository is the **protocol workspace**, not a consumer app. iOS
-(Swift), Android (Kotlin), Mac, Linux, and Windows all bind the same
-sync crate: `reedhold-api`. AI agents use the same session through
-`reedhold-mcp` (`mcport` + `blazingly-json`). The intended security
-kernel is [Blindplane](https://github.com/sergii-ziborov/blindplane);
-it stays a separate library.
+This repository is the protocol workspace, not a consumer app.
+
+| Repo | Role |
+| --- | --- |
+| [reedhold](https://github.com/sergii-ziborov/reedhold) | Protocol crates (`reedhold-api` is the only host surface) |
+| [reedhold-host](https://github.com/sergii-ziborov/reedhold-host) | Sync JSON HTTP process wrapping `reedhold-api` (no Tokio in the kernel) |
+| [reedhold-swift](https://github.com/sergii-ziborov/reedhold-swift) | iOS 14+ / macOS 11+ client |
+| [reedhold-site](https://github.com/sergii-ziborov/reedhold-site) | Public site (React + Vite) |
+| [reedhold-mcp](https://github.com/sergii-ziborov/reedhold) (`reedhold-mcp` crate) | Agent MCP stdio in this workspace |
+
+There is no Kotlin / Android repo. UIs call `reedhold-api` (later UniFFI) or
+`reedhold-host`. They never import mesh, storage, or MCP internals.
+
+The intended security kernel is
+[Blindplane](https://github.com/sergii-ziborov/blindplane); it stays a
+separate library.
 
 > Prototype. Not independently audited. Do not use for real secrets yet.
 
-## What is in scope
+## What the protocol already has
 
 - recoverable identity (`MasterSeed` is random; a password only unlocks a vault)
 - canonical binary encoding
-- signed social events
-- recovery manifests that can be stored on untrusted hosts
-- ports for mesh, storage, chain, and a bounded client
-- daily rotating transitional relays; the company site is optional
-- a genesis advertising token that cannot control the mesh
-- a sync host API that UI processes can wrap (no Tokio)
-- an MCP server so an agent can create, restore, emit, and verify
-- a local sealed store and k-of-n seed shares for reinstall / lost password
-- an in-process mesh fabric: direct, rotating-relay store-and-forward, company optional
-- Reed-Solomon durable objects: 4-of-6 for identity, survive a third of holders, then repair
-- DMs and small groups over the fabric: pairwise X25519, shared epoch keys, membership rotation, MLS later
+- signed social events (`post` through `group_leave`)
+- recovery manifests for untrusted hosts; k-of-n Shamir shares
+- local sealed store and reinstall proof
+- daily rotating transitional relays; company host optional; blocking it is not fatal
+- genesis advertising token: market rights only, not network control
+- in-process mesh fabric: direct, rotating-relay store-and-forward
+- DMs and small groups: pairwise X25519, shared epoch keys, leave rotates the key
+- Reed-Solomon durable objects: 4-of-6, survive a third of holders, then repair
 - compact chain headers: identity/group/storage Merkle roots, 64-header light window, no message bytes
 - reputation v0: likes mature, cluster pumps are cheap, influence budget, not transferable
-- attention-market sandbox: batch uniform-price auction on topic/bucket/epoch, no user-id targeting
+- attention-market sandbox: batch uniform-price on `(topic, bucket, epoch)`, no user-id targeting
 - proof of contribution: storage/relay/repair mint credits; history stays; popularity is not consensus
+- sync host API (`reedhold-api`) and MCP (`reedhold-mcp` via `mcport` + `blazingly-json`)
 
-## What is not in this repo yet
+## What is not in this repo
 
-- a chat UI
-- a production DHT / QUIC / BLE link (the routing fabric is in-process first)
-- a token or speculative economy
+- a production DHT / QUIC / BLE link (the fabric is in-process first)
+- MLS for large groups
+- a token or speculative economy (sandbox credits only)
 - company servers as a source of truth
+- consumer UIs (see sibling repos)
+
+## Host API (`reedhold-api`)
+
+Swift, desktop, the HTTP host, and MCP all share this crate. Strings and hex
+only. No Tokio.
+
+| Type | Job |
+| --- | --- |
+| `Session` | create / restore / emit / verify / sealed DM / password change |
+| `TalkNet` | DMs and small groups over the fabric |
+| `MeshSession` | in-process routing (direct / relay / held) |
+| `DurableSession` | erasure grid put/get/kill/repair |
+| `ChainSession` | compact headers, Merkle proofs |
+| `RepSession` | mature reactions, influence budget |
+| `MarketSession` | topic/bucket auctions |
+| `WorkSession` | contribution credits |
+| `advertising_limits()` | genesis token capability mask |
+
+Identity URI:
+
+```text
+reedhold:identity:<hex>
+```
+
+Human handles (`@name`) are aliases. They are not the identity.
 
 ## Workspace
 
@@ -52,23 +86,19 @@ crates/reedhold-recovery    vault + RecoveryManifest
 crates/reedhold-event       SocialEvent kinds and envelopes
 crates/reedhold-protocol    account lifecycle over the above
 crates/reedhold-rep         mature reactions and influence budget
-crates/reedhold-mesh        lottery, frames, in-process fabric (UDP/libp2p later)
+crates/reedhold-mesh        lottery, frames, in-process fabric
 crates/reedhold-ads         genesis token + attention-market sandbox
 crates/reedhold-storage     erasure, placement, quotas, durable grid
 crates/reedhold-chain       compact checkpoint types
 crates/reedhold-client      light-client profile
 crates/reedhold-store       local sealed manifest + signed event log
 crates/reedhold-work        proof of contribution and sandbox credits
-crates/reedhold-api         sync host session (Swift / Kotlin / desktop)
+crates/reedhold-api         sync host session (Swift / desktop / HTTP host / MCP)
 crates/reedhold-mcp         MCP stdio binary `reedhold`
 crates/reedhold             public facade (does not include MCP)
 ```
 
 Layering is one-way. Mesh, storage, and chain do not depend on each other.
-UIs and agents never import mesh internals. They import `reedhold-api`.
-Each UTC day the protocol redraws a small set of ordinary peers as
-transitional sync hosts. Blocking the company site or yesterday's relays
-does not halt the network.
 The facade does not depend on MCP. No crate depends on the facade.
 
 ```sh
@@ -89,14 +119,6 @@ Release gates:
 - no function above 100 physical lines
 - no dual `foo.rs` + `foo/` module layout
 - Clippy pedantic, warnings denied
-
-## Protocol prefix
-
-```text
-reedhold:identity:<hex>
-```
-
-Human handles (`@name`) are aliases. They are not the identity.
 
 ## License
 
