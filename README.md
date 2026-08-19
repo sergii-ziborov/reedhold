@@ -13,7 +13,7 @@ This repository is the protocol workspace, not a consumer app.
 | [reedhold](https://github.com/sergii-ziborov/reedhold) | Protocol crates (`reedhold-api` is the only host surface) |
 | [reedhold-host](https://github.com/sergii-ziborov/reedhold-host) | Sync JSON HTTP process wrapping `reedhold-api` (no Tokio in the kernel) |
 | [reedhold-swift](https://github.com/sergii-ziborov/reedhold-swift) | iOS 14+ / macOS 11+ client |
-| [reedhold-site](https://github.com/sergii-ziborov/reedhold-site) | Public site (React + Vite) |
+| [reedhold-site](https://github.com/sergii-ziborov/reedhold-site) | Public site + web app ([reedhold.com](https://reedhold.com)) |
 | [reedhold-mcp](https://github.com/sergii-ziborov/reedhold) (`reedhold-mcp` crate) | Agent MCP stdio in this workspace |
 
 There is no Kotlin / Android repo. UIs call `reedhold-api` (later UniFFI) or
