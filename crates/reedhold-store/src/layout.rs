@@ -8,6 +8,7 @@ use std::path::{Path, PathBuf};
 
 const MANIFEST_FILE: &str = "manifest.bin";
 const EVENTS_FILE: &str = "events.bin";
+const CIRCLES_FILE: &str = "circles.bin";
 
 /// A directory that holds one account's sealed manifest and signed events.
 #[derive(Clone, Debug)]
@@ -79,6 +80,30 @@ impl LocalStore {
         match fs::read(self.root.join(EVENTS_FILE)) {
             Ok(bytes) => read_log(&bytes),
             Err(_) => Ok(Vec::new()),
+        }
+    }
+
+    /// Write the sealed group book. Missing is fine; the file is optional.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Codec`] on I/O failure.
+    pub fn save_circles(&self, bytes: &[u8]) -> Result<()> {
+        fs::create_dir_all(&self.root)
+            .map_err(|_| Error::Codec("cannot create store directory"))?;
+        fs::write(self.root.join(CIRCLES_FILE), bytes)
+            .map_err(|_| Error::Codec("cannot write group book"))
+    }
+
+    /// Load the sealed group book. Missing file is `None`.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Codec`] when the file cannot be read.
+    pub fn load_circles(&self) -> Result<Option<Vec<u8>>> {
+        match fs::read(self.root.join(CIRCLES_FILE)) {
+            Ok(bytes) => Ok(Some(bytes)),
+            Err(_) => Ok(None),
         }
     }
 

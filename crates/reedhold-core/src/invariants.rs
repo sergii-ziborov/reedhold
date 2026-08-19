@@ -18,4 +18,5 @@ pub const INVARIANTS: &[&str] = &[
     "company_is_not_a_required_shard_holder",
     "outsiders_cannot_read_talk",
     "small_groups_are_not_mls_yet",
+    "removed_member_cannot_read_new_epoch",
 ];

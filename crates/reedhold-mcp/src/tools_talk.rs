@@ -88,6 +88,21 @@ pub(crate) fn talk_invite(host: &mut Host, arguments: Value) -> ToolReply {
     }
 }
 
+pub(crate) fn talk_remove(host: &mut Host, arguments: Value) -> ToolReply {
+    let group = match required_str(&arguments, "group") {
+        Ok(value) => value,
+        Err(error) => return ToolReply::error(error.to_string()),
+    };
+    let member = match required_str(&arguments, "member") {
+        Ok(value) => value,
+        Err(error) => return ToolReply::error(error.to_string()),
+    };
+    match host.talk_remove(group, member) {
+        Ok(routes) => ToolReply::structured(routes),
+        Err(error) => ToolReply::error(error.to_string()),
+    }
+}
+
 pub(crate) fn talk_send(host: &mut Host, arguments: Value) -> ToolReply {
     let group = match required_str(&arguments, "group") {
         Ok(value) => value,

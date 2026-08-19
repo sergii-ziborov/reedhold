@@ -54,6 +54,19 @@ impl MessagingKeys {
             .map_err(|_| Error::Identity("pairwise hkdf failed"))?;
         Ok(okm)
     }
+
+    /// Key that seals the local group book. Not a network key.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Identity`] when HKDF expansion fails.
+    pub fn book_key(&self) -> Result<[u8; 32]> {
+        let hkdf = Hkdf::<Sha256>::new(None, &self.secret);
+        let mut okm = [0_u8; 32];
+        hkdf.expand(DomainTag::CircleBook.as_bytes(), &mut okm)
+            .map_err(|_| Error::Identity("circle-book hkdf failed"))?;
+        Ok(okm)
+    }
 }
 
 impl core::fmt::Debug for MessagingKeys {

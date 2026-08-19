@@ -639,6 +639,7 @@ name = "reedhold-protocol"
 version = "0.1.0"
 dependencies = [
  "getrandom",
+ "reedhold-codec",
  "reedhold-core",
  "reedhold-event",
  "reedhold-identity",

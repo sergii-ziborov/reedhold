@@ -35,6 +35,8 @@ pub enum DomainTag {
     TalkPair,
     /// Small-group conversation identifier.
     TalkGroup,
+    /// Local seal for the persisted group book.
+    CircleBook,
 }
 
 impl DomainTag {
@@ -55,6 +57,7 @@ impl DomainTag {
             Self::AdvertisingRoot => "reedhold/ads-root/v1",
             Self::TalkPair => "reedhold/talk-pair/v1",
             Self::TalkGroup => "reedhold/talk-group/v1",
+            Self::CircleBook => "reedhold/circle-book/v1",
         }
     }
 
@@ -85,6 +88,7 @@ mod tests {
             DomainTag::AdvertisingRoot,
             DomainTag::TalkPair,
             DomainTag::TalkGroup,
+            DomainTag::CircleBook,
         ]
         .map(DomainTag::as_str);
         for (index, label) in labels.iter().enumerate() {

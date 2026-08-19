@@ -1,7 +1,7 @@
 //! In-process session used by every host.
 
 use crate::view::{AccountView, EventView, ManifestView};
-use reedhold_core::{ConversationId, Error, NetworkId, Result, decode_hex, decode32};
+use reedhold_core::{ConversationId, Error, IdentityId, NetworkId, Result, decode_hex, decode32};
 use reedhold_event::{EventKind, SignedEvent, open_message, seal_message};
 use reedhold_protocol::{Account, Circle, create_account, restore_account};
 use reedhold_recovery::KdfParams;
@@ -21,6 +21,7 @@ pub struct Session {
     pub(crate) account: Account,
     pub(crate) log: Vec<StoredEvent>,
     pub(crate) circles: BTreeMap<ConversationId, Circle>,
+    pubs: BTreeMap<IdentityId, [u8; 32]>,
 }
 
 impl Session {
@@ -134,6 +135,7 @@ impl Session {
             account,
             log,
             circles: BTreeMap::new(),
+            pubs: BTreeMap::new(),
         }
     }
 
@@ -155,6 +157,21 @@ impl Session {
         self.circles
             .get_mut(&id)
             .ok_or(Error::Event("unknown group"))
+    }
+
+    pub(crate) fn forget_circle(&mut self, id: ConversationId) {
+        self.circles.remove(&id);
+    }
+
+    pub(crate) fn remember_pub(&mut self, id: IdentityId, public: [u8; 32]) {
+        self.pubs.insert(id, public);
+    }
+
+    pub(crate) fn lookup_pub(&self, id: IdentityId) -> Result<[u8; 32]> {
+        self.pubs
+            .get(&id)
+            .copied()
+            .ok_or(Error::Event("unknown member messaging key"))
     }
 
     pub(crate) fn push_log(&mut self, event: &SignedEvent, body: &[u8]) -> Result<()> {

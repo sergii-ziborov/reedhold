@@ -218,6 +218,12 @@ pub(crate) fn with_talk(server: McpServer<Host>) -> McpServer<Host> {
             tools_talk::talk_send,
         )
         .tool_with_state(
+            "talk_remove",
+            "Owner removes a member, rotates the epoch key, and re-wraps the rest.",
+            object_schema(&["group", "member"]),
+            tools_talk::talk_remove,
+        )
+        .tool_with_state(
             "talk_inbox",
             "Drain and decrypt talk for the unlocked identity.",
             object_schema(&[]),

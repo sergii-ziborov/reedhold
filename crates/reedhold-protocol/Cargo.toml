@@ -12,6 +12,7 @@ publish.workspace = true
 
 [dependencies]
 getrandom.workspace = true
+reedhold-codec.workspace = true
 reedhold-core.workspace = true
 reedhold-event.workspace = true
 reedhold-identity.workspace = true

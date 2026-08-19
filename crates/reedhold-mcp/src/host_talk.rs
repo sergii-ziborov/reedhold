@@ -62,6 +62,11 @@ impl Host {
         talk.send_circle(session, group, plaintext)
     }
 
+    pub(crate) fn talk_remove(&mut self, group: &str, member: &str) -> Result<Vec<RouteView>> {
+        let (talk, session) = self.talk_and_session()?;
+        talk.remove(session, group, member)
+    }
+
     pub(crate) fn talk_inbox(&mut self) -> Result<Vec<TalkView>> {
         let (talk, session) = self.talk_and_session()?;
         talk.inbox(session)

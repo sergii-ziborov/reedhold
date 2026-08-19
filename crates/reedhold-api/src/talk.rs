@@ -117,18 +117,47 @@ impl TalkNet {
     ) -> Result<RouteView> {
         let group = ConversationId::from_hex(group_hex)?;
         let member = IdentityId::from_hex(member_hex)?;
+        owner.remember_pub(member, decode32(member_msg_pub_hex)?);
         owner.circle_mut(group)?.include(member);
-        let invite = owner.circle(group)?.invite_body();
-        let wrap = owner.account.messaging().agree(
-            &decode32(member_msg_pub_hex)?,
-            owner.account.identity(),
-            member,
-        )?;
-        let body = TalkBody {
-            conversation: group,
-            envelope: seal_message(&wrap, &invite.encode()?)?,
-        };
+        let body = wrap_invite(owner, group, member)?;
         self.dispatch(owner, member_hex, EventKind::GroupInvite, &body)
+    }
+
+    /// Owner removes a member, rotates the epoch key, and re-wraps the rest.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Event`] when the caller is not the owner.
+    pub fn remove(
+        &mut self,
+        owner: &mut Session,
+        group_hex: &str,
+        member_hex: &str,
+    ) -> Result<Vec<RouteView>> {
+        let group = ConversationId::from_hex(group_hex)?;
+        let member = IdentityId::from_hex(member_hex)?;
+        if owner.account.identity() != owner.circle(group)?.owner {
+            return Err(Error::Event("only the owner may rotate membership"));
+        }
+        let notice = TalkBody {
+            conversation: group,
+            envelope: owner.circle(group)?.seal(member.as_digest().as_bytes())?,
+        };
+        let mut routes = vec![self.dispatch(owner, member_hex, EventKind::GroupLeave, &notice)?];
+        owner.circle_mut(group)?.exclude(member)?;
+        owner.circle_mut(group)?.rotate()?;
+        let rest: Vec<IdentityId> = owner
+            .circle(group)?
+            .members
+            .iter()
+            .copied()
+            .filter(|id| *id != owner.account.identity())
+            .collect();
+        for peer in rest {
+            let body = wrap_invite(owner, group, peer)?;
+            routes.push(self.dispatch(owner, &peer.to_hex(), EventKind::GroupInvite, &body)?);
+        }
+        Ok(routes)
     }
 
     /// Fan the same sealed group message out to every other member.
@@ -201,4 +230,16 @@ impl TalkNet {
         self.mesh
             .send(&from.peer_hex(), to_hex, &encode_hex(&packet.encode()?))
     }
+}
+
+fn wrap_invite(owner: &Session, group: ConversationId, member: IdentityId) -> Result<TalkBody> {
+    let wrap = owner.account.messaging().agree(
+        &owner.lookup_pub(member)?,
+        owner.account.identity(),
+        member,
+    )?;
+    Ok(TalkBody {
+        conversation: group,
+        envelope: seal_message(&wrap, &owner.circle(group)?.invite_body().encode()?)?,
+    })
 }

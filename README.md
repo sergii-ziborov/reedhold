@@ -29,7 +29,7 @@ it stays a separate library.
 - a local sealed store and k-of-n seed shares for reinstall / lost password
 - an in-process mesh fabric: direct, rotating-relay store-and-forward, company optional
 - Reed-Solomon durable objects: 4-of-6 for identity, survive a third of holders, then repair
-- DMs and small groups over the fabric: pairwise X25519, shared epoch keys, MLS later
+- DMs and small groups over the fabric: pairwise X25519, shared epoch keys, membership rotation, MLS later
 
 ## What is not in this repo yet
 

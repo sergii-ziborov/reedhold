@@ -1,7 +1,7 @@
 //! Decrypt delivered talk packets into host views.
 
 use crate::session::Session;
-use reedhold_core::{Error, NetworkId, Result};
+use reedhold_core::{Digest32, Error, IdentityId, NetworkId, Result};
 use reedhold_event::{EventKind, SignedEvent, TalkBody, TalkPacket, open_message};
 use reedhold_protocol::Circle;
 use serde::Serialize;
@@ -40,6 +40,7 @@ pub(crate) fn ingest_one(session: &mut Session, item: &str) -> Result<TalkView> 
     if event.author != packet.author {
         return Err(Error::Event("talk author mismatch"));
     }
+    session.remember_pub(packet.author, packet.messaging_public);
     let body = TalkBody::decode(&packet.body)?;
     let (kind, text) = open_talk(session, &event, &packet, &body)?;
     Ok(TalkView {
@@ -79,6 +80,18 @@ fn open_talk(
         EventKind::GroupMessage => {
             let plain = session.circle(body.conversation)?.open(&body.envelope)?;
             Ok((event.kind.as_str().to_owned(), utf8(&plain)?))
+        }
+        EventKind::GroupLeave => {
+            let plain = session.circle(body.conversation)?.open(&body.envelope)?;
+            let raw: [u8; 32] = plain
+                .as_slice()
+                .try_into()
+                .map_err(|_| Error::Event("leave payload has the wrong length"))?;
+            let removed = IdentityId::from_digest(Digest32::from_bytes(raw));
+            if removed == session.account.identity() {
+                session.forget_circle(body.conversation);
+            }
+            Ok((event.kind.as_str().to_owned(), removed.to_hex()))
         }
         _ => Err(Error::Event("unsupported talk kind")),
     }
@@ -172,5 +185,43 @@ mod tests {
         talk.send_circle(&mut alice, &group.id, "hello").unwrap();
         assert_eq!(talk.inbox(&mut bob).unwrap()[0].text, "hello");
         assert_eq!(talk.inbox(&mut carol).unwrap()[0].text, "hello");
+    }
+
+    #[test]
+    fn removed_member_cannot_read_new_epoch() {
+        let mut alice = handset(6);
+        let mut bob = handset(7);
+        let mut carol = handset(8);
+        let extras: Vec<String> = (30_u8..=36).map(secret).collect();
+        let mut candidates = vec![alice.peer_hex(), bob.peer_hex(), carol.peer_hex()];
+        candidates.extend(extras);
+        let mut talk = TalkNet::open(6, &secret(0), &candidates, None, Some(2)).unwrap();
+        talk.online(&alice.peer_hex()).unwrap();
+        talk.online(&bob.peer_hex()).unwrap();
+        talk.online(&carol.peer_hex()).unwrap();
+        let group = talk.create_circle(&mut alice, "room").unwrap();
+        talk.invite(
+            &mut alice,
+            &group.id,
+            &bob.peer_hex(),
+            &bob.view().messaging_public,
+        )
+        .unwrap();
+        talk.invite(
+            &mut alice,
+            &group.id,
+            &carol.peer_hex(),
+            &carol.view().messaging_public,
+        )
+        .unwrap();
+        talk.inbox(&mut bob).unwrap();
+        talk.inbox(&mut carol).unwrap();
+        talk.remove(&mut alice, &group.id, &carol.peer_hex())
+            .unwrap();
+        assert_eq!(talk.inbox(&mut carol).unwrap()[0].kind, "group_leave");
+        talk.inbox(&mut bob).unwrap();
+        talk.send_circle(&mut alice, &group.id, "after").unwrap();
+        assert_eq!(talk.inbox(&mut bob).unwrap()[0].text, "after");
+        assert!(talk.inbox(&mut carol).unwrap().is_empty());
     }
 }
