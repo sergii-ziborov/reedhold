@@ -59,7 +59,7 @@ only. No Tokio.
 | Type | Job |
 | --- | --- |
 | `Session` | create / restore / emit / verify / sealed DM / password change / Shamir split |
-| HTTP (`reedhold-host`) | same session surface over JSON on `127.0.0.1:4783` |
+| HTTP (`reedhold-host`) | session + talk + durable + chain + rep + ads + work on `127.0.0.1:4783` |
 | `TalkNet` | DMs and small groups over the fabric |
 | `MeshSession` | in-process routing (direct / relay / held) |
 | `DurableSession` | erasure grid put/get/kill/repair |
