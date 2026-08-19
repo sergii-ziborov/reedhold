@@ -21,9 +21,9 @@ pub struct Session {
     pub(crate) account: Account,
     pub(crate) log: Vec<StoredEvent>,
     pub(crate) circles: BTreeMap<ConversationId, Circle>,
-    pubs: BTreeMap<IdentityId, [u8; 32]>,
+    pub(crate) pubs: BTreeMap<IdentityId, [u8; 32]>,
     pub(crate) contacts: BTreeMap<IdentityId, crate::contacts::ContactEntry>,
-    threads: BTreeMap<String, Vec<crate::inbox::TalkView>>,
+    pub(crate) threads: BTreeMap<String, Vec<crate::inbox::TalkView>>,
 }
 
 impl Session {

@@ -21,6 +21,22 @@ pub struct ContactView {
     pub conversation: String,
 }
 
+/// Someone wrote who is not in the address book yet.
+///
+/// Without this a stranger's message lands in the transcript with no chat row
+/// to show it in, and looks exactly like a message that never arrived.
+#[derive(Clone, Debug, Serialize, Eq, PartialEq)]
+pub struct RequestView {
+    /// Sender identity hex.
+    pub identity: String,
+    /// Sender messaging public key hex, learned from the packet.
+    pub messaging_public: String,
+    /// Conversation hex the messages are filed under.
+    pub conversation: String,
+    /// How many messages are waiting.
+    pub count: usize,
+}
+
 #[derive(Clone, Debug)]
 pub(crate) struct ContactEntry {
     pub(crate) messaging_public: [u8; 32],
@@ -71,6 +87,45 @@ impl Session {
         self.contacts
             .iter()
             .map(|(id, entry)| contact_view_with(me, *id, entry))
+            .collect()
+    }
+
+    /// Conversations opened by people who are not contacts yet.
+    ///
+    /// Group traffic is excluded: a group already has its own chat row.
+    #[must_use]
+    pub fn requests(&self) -> Vec<RequestView> {
+        let me = self.account.identity();
+        let mut seen: std::collections::BTreeMap<IdentityId, (String, usize)> =
+            std::collections::BTreeMap::new();
+        for (conversation, items) in &self.threads {
+            if reedhold_core::ConversationId::from_hex(conversation)
+                .is_ok_and(|id| self.circles.contains_key(&id))
+            {
+                continue;
+            }
+            for item in items {
+                let Ok(from) = IdentityId::from_hex(&item.from) else {
+                    continue;
+                };
+                if from == me || self.contacts.contains_key(&from) {
+                    continue;
+                }
+                let entry = seen.entry(from).or_insert((conversation.clone(), 0));
+                entry.1 = entry.1.saturating_add(1);
+            }
+        }
+        seen.into_iter()
+            .map(|(id, (conversation, count))| RequestView {
+                identity: id.to_hex(),
+                messaging_public: self
+                    .pubs
+                    .get(&id)
+                    .map(|key| reedhold_core::encode_hex(key))
+                    .unwrap_or_default(),
+                conversation,
+                count,
+            })
             .collect()
     }
 

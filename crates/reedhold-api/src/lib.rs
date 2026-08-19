@@ -23,7 +23,7 @@ mod work;
 pub use ads::{AdvertisingLimitsView, advertising_limits};
 pub use alias::{AliasDirectory, AliasView};
 pub use chain::{ChainSession, HeaderView, ProofView};
-pub use contacts::ContactView;
+pub use contacts::{ContactView, RequestView};
 pub use durable::{DurableSession, ObjectView};
 pub use inbox::{CircleView, TalkView};
 pub use market::{ClearingView, MarketSession, SplitView};
