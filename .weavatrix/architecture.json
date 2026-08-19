@@ -50,6 +50,11 @@
       "paths": ["crates/reedhold-rep"]
     },
     {
+      "id": "work",
+      "name": "Proof of contribution and network credits",
+      "paths": ["crates/reedhold-work"]
+    },
+    {
       "id": "storage",
       "name": "Durability classes and budgets",
       "paths": ["crates/reedhold-storage"]
@@ -103,7 +108,8 @@
         "api",
         "mcp",
         "facade",
-        "rep"
+        "rep",
+        "work"
       ],
       "kinds": ["imports", "re_exports", "depends_on"]
     },
@@ -123,7 +129,8 @@
         "api",
         "mcp",
         "facade",
-        "rep"
+        "rep",
+        "work"
       ],
       "kinds": ["imports", "re_exports", "depends_on"]
     },
@@ -142,7 +149,8 @@
         "api",
         "mcp",
         "facade",
-        "rep"
+        "rep",
+        "work"
       ],
       "kinds": ["imports", "re_exports", "depends_on"]
     },
@@ -150,14 +158,14 @@
       "id": "recovery-does-not-see-events-or-network",
       "action": "forbid",
       "from": ["recovery"],
-      "to": ["event", "protocol", "mesh", "storage", "chain", "client", "api", "mcp", "facade", "rep"],
+      "to": ["event", "protocol", "mesh", "storage", "chain", "client", "api", "mcp", "facade", "rep", "work"],
       "kinds": ["imports", "re_exports", "depends_on"]
     },
     {
       "id": "event-does-not-see-recovery-or-network",
       "action": "forbid",
       "from": ["event"],
-      "to": ["recovery", "protocol", "mesh", "storage", "chain", "client", "api", "mcp", "facade", "rep"],
+      "to": ["recovery", "protocol", "mesh", "storage", "chain", "client", "api", "mcp", "facade", "rep", "work"],
       "kinds": ["imports", "re_exports", "depends_on"]
     },
     {
@@ -183,7 +191,8 @@
         "mcp",
         "ads",
         "facade",
-        "rep"
+        "rep",
+        "work"
       ],
       "kinds": ["imports", "re_exports", "depends_on"]
     },
@@ -203,7 +212,8 @@
         "api",
         "mcp",
         "facade",
-        "rep"
+        "rep",
+        "work"
       ],
       "kinds": ["imports", "re_exports", "depends_on"]
     },
@@ -222,7 +232,8 @@
         "api",
         "mcp",
         "facade",
-        "rep"
+        "rep",
+        "work"
       ],
       "kinds": ["imports", "re_exports", "depends_on"]
     },
@@ -230,7 +241,7 @@
       "id": "store-is-local-only",
       "action": "forbid",
       "from": ["store"],
-      "to": ["mesh", "ads", "chain", "client", "api", "mcp", "facade", "identity", "protocol", "rep"],
+      "to": ["mesh", "ads", "chain", "client", "api", "mcp", "facade", "identity", "protocol", "rep", "work"],
       "kinds": ["imports", "re_exports", "depends_on"]
     },
     {
@@ -254,7 +265,8 @@
         "storage",
         "chain",
         "identity",
-        "rep"
+        "rep",
+        "work"
       ],
       "kinds": ["imports", "re_exports", "depends_on"]
     },
@@ -273,7 +285,8 @@
         "recovery",
         "event",
         "codec",
-        "rep"
+        "rep",
+        "work"
       ],
       "kinds": ["imports", "re_exports", "depends_on"]
     },
@@ -293,6 +306,28 @@
         "api",
         "mcp",
         "ads",
+        "facade",
+        "work"
+      ],
+      "kinds": ["imports", "re_exports", "depends_on"]
+    },
+    {
+      "id": "work-is-a-port",
+      "action": "forbid",
+      "from": ["work"],
+      "to": [
+        "identity",
+        "recovery",
+        "event",
+        "protocol",
+        "mesh",
+        "storage",
+        "chain",
+        "client",
+        "api",
+        "mcp",
+        "ads",
+        "rep",
         "facade"
       ],
       "kinds": ["imports", "re_exports", "depends_on"]
@@ -322,7 +357,8 @@
         "mcp",
         "ads",
         "store",
-        "rep"
+        "rep",
+        "work"
       ],
       "to": ["facade"],
       "kinds": ["imports", "re_exports", "depends_on"]

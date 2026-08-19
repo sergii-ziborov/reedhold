@@ -33,6 +33,7 @@ it stays a separate library.
 - compact chain headers: identity/group/storage Merkle roots, 64-header light window, no message bytes
 - reputation v0: likes mature, cluster pumps are cheap, influence budget, not transferable
 - attention-market sandbox: batch uniform-price auction on topic/bucket/epoch, no user-id targeting
+- proof of contribution: storage/relay/repair mint credits; history stays; popularity is not consensus
 
 ## What is not in this repo yet
 
@@ -57,6 +58,7 @@ crates/reedhold-storage     erasure, placement, quotas, durable grid
 crates/reedhold-chain       compact checkpoint types
 crates/reedhold-client      light-client profile
 crates/reedhold-store       local sealed manifest + signed event log
+crates/reedhold-work        proof of contribution and sandbox credits
 crates/reedhold-api         sync host session (Swift / Kotlin / desktop)
 crates/reedhold-mcp         MCP stdio binary `reedhold`
 crates/reedhold             public facade (does not include MCP)

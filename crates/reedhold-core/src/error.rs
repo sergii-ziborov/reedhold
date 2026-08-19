@@ -23,6 +23,8 @@ pub enum Error {
     Reputation(&'static str),
     /// Advertising market failed.
     Ads(&'static str),
+    /// Proof-of-contribution or credit transfer failed.
+    Work(&'static str),
     /// Operating-system entropy was unavailable.
     Entropy,
 }
@@ -39,6 +41,7 @@ impl fmt::Display for Error {
             Self::Chain(reason) => write!(formatter, "chain: {reason}"),
             Self::Reputation(reason) => write!(formatter, "reputation: {reason}"),
             Self::Ads(reason) => write!(formatter, "ads: {reason}"),
+            Self::Work(reason) => write!(formatter, "work: {reason}"),
             Self::Entropy => formatter.write_str("system entropy unavailable"),
         }
     }

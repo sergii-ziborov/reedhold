@@ -26,4 +26,7 @@ pub const INVARIANTS: &[&str] = &[
     "ads_market_runs_without_genesis",
     "ads_cannot_target_user_id",
     "stronger_attention_costs_more",
+    "credits_are_transferable",
+    "contribution_history_is_not_transferable",
+    "popularity_is_not_consensus",
 ];

@@ -534,6 +534,7 @@ dependencies = [
  "reedhold-rep",
  "reedhold-storage",
  "reedhold-store",
+ "reedhold-work",
 ]
 
 [[package]]
@@ -561,6 +562,7 @@ dependencies = [
  "reedhold-rep",
  "reedhold-storage",
  "reedhold-store",
+ "reedhold-work",
  "serde",
 ]
 
@@ -688,6 +690,13 @@ dependencies = [
  "reedhold-core",
  "reedhold-event",
  "reedhold-recovery",
+]
+
+[[package]]
+name = "reedhold-work"
+version = "0.1.0"
+dependencies = [
+ "reedhold-core",
 ]
 
 [[package]]

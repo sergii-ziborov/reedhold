@@ -15,6 +15,7 @@ mod shares;
 mod sync;
 mod talk;
 mod view;
+mod work;
 
 pub use ads::{AdvertisingLimitsView, advertising_limits};
 pub use chain::{ChainSession, HeaderView, ProofView};
@@ -28,3 +29,4 @@ pub use shares::{ShareView, session_from_shares};
 pub use sync::{SyncPlanView, sync_plan};
 pub use talk::TalkNet;
 pub use view::{AccountView, EventView, ManifestView, invariants};
+pub use work::{WorkSession, WorkView};

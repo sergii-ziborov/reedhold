@@ -17,6 +17,7 @@ members = [
     "crates/reedhold-recovery",
     "crates/reedhold-storage",
     "crates/reedhold-store",
+    "crates/reedhold-work",
 ]
 
 [workspace.package]
@@ -47,6 +48,7 @@ reedhold-rep = { version = "0.1.0", path = "crates/reedhold-rep" }
 reedhold-recovery = { version = "0.1.0", path = "crates/reedhold-recovery" }
 reedhold-storage = { version = "0.1.0", path = "crates/reedhold-storage" }
 reedhold-store = { version = "0.1.0", path = "crates/reedhold-store" }
+reedhold-work = { version = "0.1.0", path = "crates/reedhold-work" }
 
 argon2 = { version = "0.5.3", default-features = false, features = ["alloc"] }
 blazingly-json = "0.1.5"

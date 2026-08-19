@@ -28,6 +28,7 @@ fn crate_manifests_respect_the_layering() {
         "reedhold-client",
         "reedhold-ads",
         "reedhold-store",
+        "reedhold-work",
         "reedhold-api",
         "reedhold-mcp",
     ] {
@@ -47,6 +48,7 @@ fn crate_manifests_respect_the_layering() {
         "reedhold-client",
         "reedhold-ads",
         "reedhold-store",
+        "reedhold-work",
     ] {
         assert_no_dep(&root, crate_name, HOSTS);
     }
@@ -80,6 +82,7 @@ fn crate_manifests_respect_the_layering() {
             "reedhold-chain",
             "reedhold-client",
             "reedhold-rep",
+            "reedhold-work",
             "reedhold-identity",
             "reedhold-protocol",
             "reedhold-recovery",

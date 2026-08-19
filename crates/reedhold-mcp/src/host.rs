@@ -2,7 +2,7 @@
 
 use reedhold_api::{
     AccountView, ChainSession, DurableSession, EventView, ManifestView, MarketSession, MeshSession,
-    RepSession, Session, TalkNet,
+    RepSession, Session, TalkNet, WorkSession,
 };
 use reedhold_core::{Error, Result};
 
@@ -16,6 +16,7 @@ pub struct Host {
     pub(crate) chain: Option<ChainSession>,
     pub(crate) rep: Option<RepSession>,
     pub(crate) ads: Option<MarketSession>,
+    pub(crate) work: Option<WorkSession>,
 }
 
 impl Host {

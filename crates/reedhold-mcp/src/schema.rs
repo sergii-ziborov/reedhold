@@ -185,3 +185,18 @@ pub(crate) fn ads_book_schema() -> Value {
         "additionalProperties": false
     })
 }
+
+pub(crate) fn work_record_schema() -> Value {
+    json!({
+        "type": "object",
+        "properties": {
+            "node": { "type": "string" },
+            "kind": { "type": "string" },
+            "units": { "type": "string" },
+            "epoch": { "type": "string" },
+            "reliable": { "type": "string" }
+        },
+        "required": ["node", "kind", "units", "epoch"],
+        "additionalProperties": false
+    })
+}

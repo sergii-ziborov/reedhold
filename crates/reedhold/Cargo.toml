@@ -28,6 +28,7 @@ reedhold-rep.workspace = true
 reedhold-recovery.workspace = true
 reedhold-storage.workspace = true
 reedhold-store.workspace = true
+reedhold-work.workspace = true
 
 [lints]
 workspace = true
