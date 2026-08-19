@@ -37,6 +37,10 @@ separate library.
 - genesis advertising token: market rights only, not network control
 - in-process mesh fabric: direct, rotating-relay store-and-forward
 - DMs and small groups: pairwise X25519, shared epoch keys, leave rotates the key
+- the author keeps their own copy: the fabric only carries mail to other people,
+  so a sender who kept nothing could never reread what they wrote
+- a late peer joins a running fabric instead of rebuilding it, because a rebuild
+  drops every relay queue and loses mail nobody has collected yet
 - public nicknames are aliases only: they are not identity and never enter signed talk bytes
 - public topic rooms: slug is a local label; posts carry identity hex
 - owner-admin groups: invite and remove rotate the epoch key
