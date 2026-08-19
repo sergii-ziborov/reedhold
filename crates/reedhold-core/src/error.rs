@@ -19,6 +19,8 @@ pub enum Error {
     Storage(&'static str),
     /// Compact chain header or proof failed.
     Chain(&'static str),
+    /// Reputation, maturity, or influence budget failed.
+    Reputation(&'static str),
     /// Operating-system entropy was unavailable.
     Entropy,
 }
@@ -33,6 +35,7 @@ impl fmt::Display for Error {
             Self::Mesh(reason) => write!(formatter, "mesh: {reason}"),
             Self::Storage(reason) => write!(formatter, "storage: {reason}"),
             Self::Chain(reason) => write!(formatter, "chain: {reason}"),
+            Self::Reputation(reason) => write!(formatter, "reputation: {reason}"),
             Self::Entropy => formatter.write_str("system entropy unavailable"),
         }
     }

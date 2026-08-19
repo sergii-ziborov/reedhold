@@ -20,4 +20,7 @@ pub const INVARIANTS: &[&str] = &[
     "small_groups_are_not_mls_yet",
     "removed_member_cannot_read_new_epoch",
     "light_client_header_window_is_bounded",
+    "instant_reaction_pump_is_cheap",
+    "reputation_is_not_transferable",
+    "influence_budget_caps_farming",
 ];

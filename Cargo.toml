@@ -13,6 +13,7 @@ members = [
     "crates/reedhold-mcp",
     "crates/reedhold-mesh",
     "crates/reedhold-protocol",
+    "crates/reedhold-rep",
     "crates/reedhold-recovery",
     "crates/reedhold-storage",
     "crates/reedhold-store",
@@ -42,6 +43,7 @@ reedhold-identity = { version = "0.1.0", path = "crates/reedhold-identity" }
 reedhold-mcp = { version = "0.1.0", path = "crates/reedhold-mcp" }
 reedhold-mesh = { version = "0.1.0", path = "crates/reedhold-mesh" }
 reedhold-protocol = { version = "0.1.0", path = "crates/reedhold-protocol" }
+reedhold-rep = { version = "0.1.0", path = "crates/reedhold-rep" }
 reedhold-recovery = { version = "0.1.0", path = "crates/reedhold-recovery" }
 reedhold-storage = { version = "0.1.0", path = "crates/reedhold-storage" }
 reedhold-store = { version = "0.1.0", path = "crates/reedhold-store" }

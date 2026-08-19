@@ -31,6 +31,7 @@ it stays a separate library.
 - Reed-Solomon durable objects: 4-of-6 for identity, survive a third of holders, then repair
 - DMs and small groups over the fabric: pairwise X25519, shared epoch keys, membership rotation, MLS later
 - compact chain headers: identity/group/storage Merkle roots, 64-header light window, no message bytes
+- reputation v0: likes mature, cluster pumps are cheap, influence budget, not transferable
 
 ## What is not in this repo yet
 
@@ -48,6 +49,7 @@ crates/reedhold-identity    MasterSeed, roots, devices
 crates/reedhold-recovery    vault + RecoveryManifest
 crates/reedhold-event       SocialEvent kinds and envelopes
 crates/reedhold-protocol    account lifecycle over the above
+crates/reedhold-rep         mature reactions and influence budget
 crates/reedhold-mesh        lottery, frames, in-process fabric (UDP/libp2p later)
 crates/reedhold-ads         genesis advertising token (market only)
 crates/reedhold-storage     erasure, placement, quotas, durable grid

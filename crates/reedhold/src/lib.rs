@@ -16,6 +16,7 @@ pub use reedhold_identity as identity;
 pub use reedhold_mesh as mesh;
 pub use reedhold_protocol as protocol;
 pub use reedhold_recovery as recovery;
+pub use reedhold_rep as rep;
 pub use reedhold_storage as storage;
 pub use reedhold_store as store;
 

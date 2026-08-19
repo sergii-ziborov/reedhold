@@ -3,10 +3,12 @@
 #![forbid(unsafe_code)]
 
 mod catalog;
+mod catalog_rep;
 mod host;
 mod host_chain;
 mod host_durable;
 mod host_mesh;
+mod host_rep;
 mod host_talk;
 mod schema;
 mod server;
@@ -14,6 +16,7 @@ mod tools;
 mod tools_chain;
 mod tools_durable;
 mod tools_mesh;
+mod tools_rep;
 mod tools_store;
 mod tools_talk;
 

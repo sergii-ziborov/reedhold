@@ -24,6 +24,7 @@ reedhold-event.workspace = true
 reedhold-identity.workspace = true
 reedhold-mesh.workspace = true
 reedhold-protocol.workspace = true
+reedhold-rep.workspace = true
 reedhold-recovery.workspace = true
 reedhold-storage.workspace = true
 reedhold-store.workspace = true

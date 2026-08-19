@@ -108,3 +108,33 @@ pub(crate) fn chain_verify_schema() -> Value {
         "additionalProperties": false
     })
 }
+
+pub(crate) fn rep_seed_schema() -> Value {
+    json!({
+        "type": "object",
+        "properties": {
+            "identity": { "type": "string" },
+            "continuity": { "type": "string" },
+            "social": { "type": "string" },
+            "content": { "type": "string" },
+            "curation": { "type": "string" }
+        },
+        "required": ["identity", "continuity", "social", "content", "curation"],
+        "additionalProperties": false
+    })
+}
+
+pub(crate) fn rep_react_schema() -> Value {
+    json!({
+        "type": "object",
+        "properties": {
+            "author": { "type": "string" },
+            "target": { "type": "string" },
+            "kind": { "type": "string" },
+            "now": { "type": "string" },
+            "cluster": { "type": "string" }
+        },
+        "required": ["author", "target", "kind", "now"],
+        "additionalProperties": false
+    })
+}
