@@ -24,6 +24,9 @@ pub struct Session {
     pub(crate) pubs: BTreeMap<IdentityId, [u8; 32]>,
     pub(crate) contacts: BTreeMap<IdentityId, crate::contacts::ContactEntry>,
     pub(crate) threads: BTreeMap<String, Vec<crate::inbox::TalkView>>,
+    pub(crate) blocked: std::collections::BTreeSet<IdentityId>,
+    pub(crate) archived: std::collections::BTreeSet<String>,
+    pub(crate) policy: crate::privacy::MessagePolicy,
 }
 
 impl Session {
@@ -140,6 +143,9 @@ impl Session {
             pubs: BTreeMap::new(),
             contacts: BTreeMap::new(),
             threads: BTreeMap::new(),
+            blocked: std::collections::BTreeSet::new(),
+            archived: std::collections::BTreeSet::new(),
+            policy: crate::privacy::MessagePolicy::Everyone,
         }
     }
 

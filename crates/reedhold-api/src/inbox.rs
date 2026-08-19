@@ -42,6 +42,15 @@ pub(crate) fn ingest_one(session: &mut Session, item: &str) -> Result<TalkView> 
     if event.author != packet.author {
         return Err(Error::Event("talk author mismatch"));
     }
+    // Group traffic follows group membership, which the owner already gates.
+    // Only conversations a stranger can start are subject to the policy.
+    let direct = matches!(
+        event.kind,
+        EventKind::DirectMessage | EventKind::GroupInvite
+    );
+    if direct && !session.accepts_from(packet.author) {
+        return Err(Error::Event("sender is refused by this account"));
+    }
     session.remember_pub(packet.author, packet.messaging_public);
     let body = TalkBody::decode(&packet.body)?;
     let (kind, text) = open_talk(session, &event, &packet, &body)?;

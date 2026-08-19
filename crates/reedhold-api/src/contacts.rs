@@ -14,6 +14,11 @@ pub struct ContactView {
     pub messaging_public: String,
     /// Local label. Empty if unset. Not an alias, not in crypto.
     pub petname: String,
+    /// The public nick this person used when you saved them.
+    ///
+    /// Kept so a later rename shows as "@bob, was @alice" instead of silently
+    /// swapping the name you knew them by.
+    pub known_nick: String,
     /// Deterministic DM conversation hex with this contact.
     ///
     /// A transcript is keyed by conversation, never by identity. Clients that
@@ -41,6 +46,7 @@ pub struct RequestView {
 pub(crate) struct ContactEntry {
     pub(crate) messaging_public: [u8; 32],
     pub(crate) petname: String,
+    pub(crate) known_nick: String,
 }
 
 impl Session {
@@ -55,12 +61,28 @@ impl Session {
         messaging_public_hex: &str,
         petname: &str,
     ) -> Result<ContactView> {
+        self.add_contact_as(identity_hex, messaging_public_hex, petname, petname)
+    }
+
+    /// Same, but records the public nick this person had at the time.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Codec`] when a hex field is the wrong length.
+    pub fn add_contact_as(
+        &mut self,
+        identity_hex: &str,
+        messaging_public_hex: &str,
+        petname: &str,
+        known_nick: &str,
+    ) -> Result<ContactView> {
         let id = IdentityId::from_hex(identity_hex)?;
         let public = decode32(messaging_public_hex)?;
         self.remember_pub(id, public);
         let entry = ContactEntry {
             messaging_public: public,
             petname: petname.trim().to_owned(),
+            known_nick: known_nick.trim().trim_start_matches('@').to_owned(),
         };
         let view = contact_view_with(self.account.identity(), id, &entry);
         self.contacts.insert(id, entry);
@@ -108,7 +130,7 @@ impl Session {
                 let Ok(from) = IdentityId::from_hex(&item.from) else {
                     continue;
                 };
-                if from == me || self.contacts.contains_key(&from) {
+                if from == me || self.contacts.contains_key(&from) || self.blocked.contains(&from) {
                     continue;
                 }
                 let entry = seen.entry(from).or_insert((conversation.clone(), 0));
@@ -145,6 +167,7 @@ fn contact_view_with(me: IdentityId, id: IdentityId, entry: &ContactEntry) -> Co
         identity: id.to_hex(),
         messaging_public: reedhold_core::encode_hex(&entry.messaging_public),
         petname: entry.petname.clone(),
+        known_nick: entry.known_nick.clone(),
         conversation: reedhold_event::dm_conversation(me, id).to_hex(),
     }
 }
