@@ -564,6 +564,7 @@ dependencies = [
  "reedhold-store",
  "reedhold-work",
  "serde",
+ "sha2",
 ]
 
 [[package]]

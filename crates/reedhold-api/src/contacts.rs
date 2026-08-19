@@ -77,7 +77,6 @@ impl Session {
             .map(|circle| circle_view_as(circle, me))
             .collect()
     }
-
 }
 
 fn contact_view(id: IdentityId, entry: &ContactEntry) -> ContactView {
