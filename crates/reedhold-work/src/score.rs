@@ -41,7 +41,22 @@ impl Score {
         }
     }
 
-    /// Network weight. Social dimensions cannot outrun actual work.
+    /// Consensus weight. Linear on purpose, and social work is excluded.
+    ///
+    /// A concave curve pays an attacker to split one node into many; a convex
+    /// curve pays for hoarding. Only a linear curve is Sybil-neutral, so the
+    /// committee lottery uses this and never [`Self::weight`].
+    #[must_use]
+    pub fn consensus_weight(self) -> u64 {
+        u64::from(self.storage)
+            .saturating_add(u64::from(self.reliability))
+            .saturating_add(u64::from(self.relay))
+            .saturating_add(u64::from(self.repair).saturating_mul(2))
+            .saturating_add(u64::from(self.uptime))
+    }
+
+    /// Displayed weight. Concave, so no single node dominates the number a
+    /// human sees. Social dimensions cannot outrun actual work.
     #[must_use]
     pub fn weight(self) -> u32 {
         let work = isqrt(self.storage)
@@ -61,6 +76,27 @@ impl Score {
 mod tests {
     use super::Score;
     use crate::kind::WorkKind;
+
+    #[test]
+    fn splitting_does_not_multiply_consensus_weight() {
+        let mut whole = Score::default();
+        whole.add(WorkKind::Storage, 10_000, true);
+        let mut shard = Score::default();
+        shard.add(WorkKind::Storage, 100, true);
+        let split: u64 = (0..100).map(|_| shard.consensus_weight()).sum();
+        assert_eq!(split, whole.consensus_weight());
+        let split_display: u64 = (0..100).map(|_| u64::from(shard.weight())).sum();
+        assert!(split_display > u64::from(whole.weight()));
+    }
+
+    #[test]
+    fn popularity_is_absent_from_consensus_weight() {
+        let mut star = Score::default();
+        star.add(WorkKind::Content, 1_000_000, true);
+        star.add(WorkKind::Curation, 1_000_000, true);
+        assert_eq!(star.consensus_weight(), 0);
+        assert!(star.weight() > 0);
+    }
 
     #[test]
     fn social_cannot_outrun_repair() {

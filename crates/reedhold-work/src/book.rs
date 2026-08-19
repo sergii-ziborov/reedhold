@@ -92,14 +92,14 @@ impl Book {
     }
 
     /// Consensus eligibility. `social` is host-supplied reputation strength.
-    /// Popularity alone is never enough.
+    /// Popularity alone is never enough, and credits buy nothing here.
     #[must_use]
     pub fn eligible(&self, node: Digest32, social: u32) -> bool {
-        let work = self.score(node).weight();
-        if work < ELIGIBLE_MIN {
+        let work = self.score(node).consensus_weight();
+        if work < u64::from(ELIGIBLE_MIN) {
             return false;
         }
-        work >= crate::math::isqrt(social)
+        work >= u64::from(crate::math::isqrt(social))
     }
 }
 
