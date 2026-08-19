@@ -138,3 +138,50 @@ pub(crate) fn rep_react_schema() -> Value {
         "additionalProperties": false
     })
 }
+
+pub(crate) fn ads_post_schema() -> Value {
+    json!({
+        "type": "object",
+        "properties": {
+            "advertiser": { "type": "string" },
+            "campaign": { "type": "string" },
+            "payload": { "type": "string" },
+            "topic": { "type": "string" },
+            "bucket_min": { "type": "string" },
+            "bucket_max": { "type": "string" },
+            "budget": { "type": "string" },
+            "expiry": { "type": "string" }
+        },
+        "required": ["advertiser", "campaign", "payload", "topic", "bucket_min", "bucket_max", "budget", "expiry"],
+        "additionalProperties": false
+    })
+}
+
+pub(crate) fn ads_bid_schema() -> Value {
+    json!({
+        "type": "object",
+        "properties": {
+            "advertiser": { "type": "string" },
+            "campaign": { "type": "string" },
+            "topic": { "type": "string" },
+            "bucket": { "type": "string" },
+            "epoch": { "type": "string" },
+            "price": { "type": "string" }
+        },
+        "required": ["advertiser", "campaign", "topic", "bucket", "epoch", "price"],
+        "additionalProperties": false
+    })
+}
+
+pub(crate) fn ads_book_schema() -> Value {
+    json!({
+        "type": "object",
+        "properties": {
+            "topic": { "type": "string" },
+            "bucket": { "type": "string" },
+            "epoch": { "type": "string" }
+        },
+        "required": ["topic", "bucket", "epoch"],
+        "additionalProperties": false
+    })
+}

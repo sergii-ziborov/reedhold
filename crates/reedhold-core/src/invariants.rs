@@ -23,4 +23,7 @@ pub const INVARIANTS: &[&str] = &[
     "instant_reaction_pump_is_cheap",
     "reputation_is_not_transferable",
     "influence_budget_caps_farming",
+    "ads_market_runs_without_genesis",
+    "ads_cannot_target_user_id",
+    "stronger_attention_costs_more",
 ];

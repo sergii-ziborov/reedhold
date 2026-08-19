@@ -32,6 +32,7 @@ it stays a separate library.
 - DMs and small groups over the fabric: pairwise X25519, shared epoch keys, membership rotation, MLS later
 - compact chain headers: identity/group/storage Merkle roots, 64-header light window, no message bytes
 - reputation v0: likes mature, cluster pumps are cheap, influence budget, not transferable
+- attention-market sandbox: batch uniform-price auction on topic/bucket/epoch, no user-id targeting
 
 ## What is not in this repo yet
 
@@ -51,7 +52,7 @@ crates/reedhold-event       SocialEvent kinds and envelopes
 crates/reedhold-protocol    account lifecycle over the above
 crates/reedhold-rep         mature reactions and influence budget
 crates/reedhold-mesh        lottery, frames, in-process fabric (UDP/libp2p later)
-crates/reedhold-ads         genesis advertising token (market only)
+crates/reedhold-ads         genesis token + attention-market sandbox
 crates/reedhold-storage     erasure, placement, quotas, durable grid
 crates/reedhold-chain       compact checkpoint types
 crates/reedhold-client      light-client profile
