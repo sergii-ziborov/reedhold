@@ -4,6 +4,8 @@ use crate::node::NodeState;
 use crate::plan::SyncPlan;
 use crate::ports::PeerId;
 use crate::route::Route;
+use crate::table::PeerTable;
+use crate::walk::walk;
 use reedhold_core::{Error, Result};
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -13,6 +15,8 @@ pub struct Fabric {
     plan: SyncPlan,
     blocked: BTreeSet<PeerId>,
     nodes: BTreeMap<PeerId, NodeState>,
+    table: PeerTable,
+    clock: u64,
 }
 
 impl Fabric {
@@ -30,7 +34,35 @@ impl Fabric {
             plan,
             blocked: BTreeSet::new(),
             nodes,
+            table: PeerTable::new(),
+            clock: 0,
         }
+    }
+
+    /// Advance the fabric clock. Liveness and uptime are measured against it.
+    pub fn tick(&mut self, now: u64) {
+        self.clock = now.max(self.clock);
+        let live: Vec<PeerId> = self
+            .nodes
+            .iter()
+            .filter(|(peer, node)| node.online && !self.blocked.contains(peer))
+            .map(|(peer, _)| *peer)
+            .collect();
+        for peer in live {
+            self.table.observe(peer, self.clock, None);
+        }
+    }
+
+    /// Read the routing table.
+    #[must_use]
+    pub const fn table(&self) -> &PeerTable {
+        &self.table
+    }
+
+    /// Record where a peer can be reached when it is in another process.
+    pub fn link(&mut self, peer: PeerId, address: String) {
+        self.nodes.entry(peer).or_default();
+        self.table.observe(peer, self.clock, Some(address));
     }
 
     /// Let a peer join a running fabric. Held mail is kept.
@@ -79,9 +111,24 @@ impl Fabric {
     pub fn send(&mut self, from: PeerId, to: PeerId, payload: Vec<u8>) -> Result<Route> {
         let _ = self.node(from)?;
         let _ = self.node(to)?;
+        self.table.observe(from, self.clock, None);
         if self.is_live(to) {
             self.node_mut(to)?.inbox.push(payload);
+            self.table.succeeded(to);
             return Ok(Route::Direct);
+        }
+        if let Some(address) = self.table.address_of(to) {
+            return Ok(Route::Remote(address, to));
+        }
+        if let Some(path) = walk(&self.table, |peer| self.is_live(peer), from, to, self.clock) {
+            let carrier = *path.last().unwrap_or(&to);
+            self.node_mut(carrier)?
+                .hold
+                .entry(to)
+                .or_default()
+                .push(payload);
+            self.table.succeeded(carrier);
+            return Ok(Route::Hops(path));
         }
         if let Some(relay) = self.live_relay() {
             self.node_mut(relay)?

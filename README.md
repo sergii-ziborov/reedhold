@@ -36,6 +36,13 @@ separate library.
 - daily rotating transitional relays; company host optional; blocking it is not fatal
 - genesis advertising token: market rights only, not network control
 - in-process mesh fabric: direct, rotating-relay store-and-forward
+- bounded peer table (256 peers) scoring peers by measured uptime and delivery
+  success, not by age: a node that has been around for years but is usually
+  dark loses to a newcomer that answers
+- greedy multi-hop routing over XOR distance, capped at 12 hops; each step must
+  land strictly closer to the target, which is what makes the walk terminate
+- `Route::Remote` hands a packet back to the host when the next hop lives in
+  another process
 - DMs and small groups: pairwise X25519, shared epoch keys, leave rotates the key
 - the author keeps their own copy: the fabric only carries mail to other people,
   so a sender who kept nothing could never reread what they wrote
