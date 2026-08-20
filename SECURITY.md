@@ -32,6 +32,22 @@ The fix is specified and not yet built: rotating mailbox topics derived from
 the pairwise shared secret, `H(shared_secret || epoch || "mailbox")`, so an
 outsider sees unrelated random ids rather than a conversation.
 
+## Passwords
+
+A recovery blob is fetched from an untrusted mesh, so anyone holding it can
+guess passwords offline for as long as they like. Two things price that.
+
+The vault is sealed under Argon2id at `KdfParams::INTERACTIVE` — RFC 9106's
+second recommended option, 64 MiB with three passes. It was previously sealed
+at the test profile, 8 MiB and a single pass, which costs an attacker almost
+nothing per guess.
+
+`seal_seed_with` accepts a second factor as Argon2's secret input. With one
+set, the password alone does not open the vault no matter how many guesses an
+attacker makes, because they are missing key material rather than solving a
+puzzle. A username is not such a factor: it is public, and the salt already
+individualises the KDF.
+
 ## Report a vulnerability
 
 Open a private GitHub security advisory on

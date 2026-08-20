@@ -41,7 +41,7 @@ impl Session {
             NetworkId::DEV,
             password.as_bytes(),
             &device,
-            KdfParams::TEST,
+            KdfParams::INTERACTIVE,
         )?;
         let manifest = manifest_view(created.account.manifest())?;
         Ok(Created {
@@ -113,7 +113,7 @@ impl Session {
     pub fn change_password(&mut self, password: &str) -> Result<ManifestView> {
         let manifest = self
             .account
-            .change_password(password.as_bytes(), KdfParams::TEST)?;
+            .change_password(password.as_bytes(), KdfParams::INTERACTIVE)?;
         manifest_view(&manifest)
     }
 

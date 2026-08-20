@@ -45,6 +45,8 @@ pub enum DomainTag {
     ChainMerkle,
     /// Public topic-room id. The human slug never appears on the wire.
     PublicRoom,
+    /// Rotating mailbox address. Replaces identity as the routing key.
+    Mailbox,
 }
 
 impl DomainTag {
@@ -70,6 +72,7 @@ impl DomainTag {
             Self::ChainHeader => "reedhold/chain-header/v1",
             Self::ChainMerkle => "reedhold/chain-merkle/v1",
             Self::PublicRoom => "reedhold/public-room/v1",
+            Self::Mailbox => "reedhold/mailbox/v1",
         }
     }
 

@@ -19,6 +19,17 @@ impl KdfParams {
         parallelism: 1,
     };
 
+    /// RFC 9106 second recommended option: 64 MiB, three passes, four lanes.
+    ///
+    /// This is the profile a real account is sealed under. The cheap one costs
+    /// an attacker almost nothing per guess, which turns a short password into
+    /// no password at all.
+    pub const INTERACTIVE: Self = Self {
+        memory_kib: 64 * 1024,
+        iterations: 3,
+        parallelism: 4,
+    };
+
     /// Encode as three little-endian `u32` values.
     #[must_use]
     pub fn to_bytes(self) -> [u8; 12] {
