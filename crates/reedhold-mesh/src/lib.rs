@@ -2,6 +2,7 @@
 
 #![forbid(unsafe_code)]
 
+mod bucket;
 mod epoch;
 mod fabric;
 mod frame;
@@ -13,6 +14,7 @@ mod route;
 mod table;
 mod walk;
 
+pub use bucket::{BUCKET_WIDTH, bucket_of};
 pub use epoch::{EPOCH_SECONDS, EpochSeed, SyncEpoch};
 pub use fabric::Fabric;
 pub use frame::{FrameKind, MeshFrame};

@@ -82,6 +82,33 @@ mod tests {
     use super::DeviceAuthority;
 
     #[test]
+    fn a_device_id_reveals_nothing_about_the_identity() {
+        // Both branches grow from the same MasterSeed, so the question is
+        // whether one can be walked back to the other. It cannot: each hop is
+        // an HKDF expansion or a SHA-256 digest, and neither inverts.
+        let master = [3_u8; 32];
+        let authority = DeviceAuthority::derive(&master).unwrap();
+        let phone = authority.device_keys(&[1_u8; 32]).unwrap();
+        let laptop = authority.device_keys(&[2_u8; 32]).unwrap();
+
+        let identity_root =
+            crate::derive::expand(&master, reedhold_core::DomainTag::IdentityRoot).unwrap();
+        let device_root =
+            crate::derive::expand(&master, reedhold_core::DomainTag::DeviceRoot).unwrap();
+        assert_ne!(identity_root, device_root, "roots must not collide");
+
+        // Two devices of one person share no bytes an observer could join on.
+        assert_ne!(phone.id, laptop.id);
+        assert_ne!(phone.public_bytes(), laptop.public_bytes());
+        assert_ne!(phone.id.as_digest().as_bytes(), &identity_root);
+        assert_ne!(phone.id.as_digest().as_bytes(), &device_root);
+
+        // The id is exactly the digest of the public key and nothing more.
+        let expected = super::digest(reedhold_core::DomainTag::DeviceRoot, &phone.public_bytes());
+        assert_eq!(phone.id.as_digest(), &expected);
+    }
+
+    #[test]
     fn device_can_sign_and_verify() {
         let authority = DeviceAuthority::derive(&[9_u8; 32]).unwrap();
         let keys = authority.device_keys(&[4_u8; 32]).unwrap();

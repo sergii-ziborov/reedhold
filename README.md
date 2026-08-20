@@ -39,6 +39,9 @@ separate library.
 - bounded peer table (256 peers) scoring peers by measured uptime and delivery
   success, not by age: a node that has been around for years but is usually
   dark loses to a newcomer that answers
+- peers grouped into k-buckets by shared key prefix, 8 per bucket, so a node
+  knows its own neighbourhood densely and the far half of the space by a
+  handful of contacts instead of trying to know everyone
 - greedy multi-hop routing over XOR distance, capped at 12 hops; each step must
   land strictly closer to the target, which is what makes the walk terminate
 - `Route::Remote` hands a packet back to the host when the next hop lives in

@@ -3,6 +3,7 @@
 //! Discovery is not consensus. This table only answers "who should carry this
 //! next", and it is capped so a phone never grows with the network.
 
+use crate::bucket::{BUCKET_WIDTH, bucket_of};
 use crate::ports::PeerId;
 use std::collections::BTreeMap;
 
@@ -77,15 +78,28 @@ pub fn distance(left: PeerId, right: PeerId) -> [u8; 32] {
 pub struct PeerTable {
     peers: BTreeMap<PeerId, PeerStat>,
     cap: usize,
+    root: Option<PeerId>,
 }
 
 impl PeerTable {
-    /// Table with the protocol cap.
+    /// Flat table with only the global cap. Used by the in-process simulator,
+    /// which has no single local node to root buckets at.
     #[must_use]
     pub fn new() -> Self {
         Self {
             peers: BTreeMap::new(),
             cap: ROUTING_PEER_CAP,
+            root: None,
+        }
+    }
+
+    /// Table as a real node keeps it: bucketed by distance from `me`.
+    #[must_use]
+    pub fn rooted(me: PeerId) -> Self {
+        Self {
+            peers: BTreeMap::new(),
+            cap: ROUTING_PEER_CAP,
+            root: Some(me),
         }
     }
 
@@ -95,6 +109,37 @@ impl PeerTable {
         Self {
             peers: BTreeMap::new(),
             cap: cap.max(1),
+            root: None,
+        }
+    }
+
+    /// Peers currently held in the bucket `peer` belongs to.
+    #[must_use]
+    pub fn bucket_len(&self, peer: PeerId) -> usize {
+        let Some(me) = self.root else {
+            return self.peers.len();
+        };
+        let index = bucket_of(me, peer);
+        self.peers
+            .keys()
+            .filter(|other| bucket_of(me, **other) == index)
+            .count()
+    }
+
+    /// Drop the weakest peer in the bucket that `peer` belongs to.
+    fn trim_bucket(&mut self, peer: PeerId, now: u64) {
+        let Some(me) = self.root else {
+            return;
+        };
+        let index = bucket_of(me, peer);
+        let worst = self
+            .peers
+            .iter()
+            .filter(|(other, _)| bucket_of(me, **other) == index)
+            .min_by_key(|(other, stat)| (stat.score(now), **other))
+            .map(|(other, _)| *other);
+        if let Some(worst) = worst {
+            self.peers.remove(&worst);
         }
     }
 
@@ -135,6 +180,9 @@ impl PeerTable {
         entry.last_seen = now;
         if address.is_some() {
             entry.address = address;
+        }
+        if self.root.is_some() && self.bucket_len(peer) > BUCKET_WIDTH {
+            self.trim_bucket(peer, now);
         }
         if self.peers.len() > cap {
             self.evict(now);
