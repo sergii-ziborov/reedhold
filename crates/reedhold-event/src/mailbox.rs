@@ -29,6 +29,24 @@ pub fn mailbox_topic(shared_secret: &[u8; 32], epoch: u64) -> Digest32 {
     Digest32::from_bytes(hasher.finalize().into())
 }
 
+/// Address anyone who looked you up can write to.
+///
+/// A pairwise topic needs both halves of a shared secret, so it cannot carry a
+/// first message: the recipient has no way to derive it yet. This one comes
+/// from the recipient's published messaging key alone.
+///
+/// The cost is honest and bounded: an observer who already knows that key can
+/// see that *someone* wrote to this person, and still cannot tell who or what.
+#[must_use]
+pub fn delivery_topic(messaging_public: &[u8; 32], epoch: u64) -> Digest32 {
+    let mut hasher = Sha256::new();
+    hasher.update(DomainTag::Mailbox.as_bytes());
+    hasher.update(b"delivery");
+    hasher.update(messaging_public);
+    hasher.update(epoch.to_be_bytes());
+    Digest32::from_bytes(hasher.finalize().into())
+}
+
 /// Which mailbox epoch a wall-clock second belongs to.
 #[must_use]
 pub const fn mailbox_epoch(now_secs: u64) -> u64 {

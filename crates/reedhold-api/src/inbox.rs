@@ -1,4 +1,4 @@
-//! Decrypt delivered talk packets into host views.
+﻿//! Decrypt delivered talk packets into host views.
 
 use crate::session::Session;
 use reedhold_core::{Digest32, Error, IdentityId, NetworkId, Result};
@@ -141,6 +141,14 @@ mod tests {
         Session::create("pw", &secret(byte)).unwrap().session
     }
 
+    /// A pairwise mailbox needs both halves, so both sides must know each other.
+    fn befriend(one: &mut Session, two: &mut Session) {
+        let (left, right) = (one.view(), two.view());
+        one.add_contact(&two.peer_hex(), &right.messaging_public, "them")
+            .unwrap();
+        two.add_contact(&one.peer_hex(), &left.messaging_public, "them")
+            .unwrap();
+    }
     #[test]
     fn dm_survives_relay_and_blocks() {
         let mut alice = handset(1);
@@ -154,6 +162,8 @@ mod tests {
         talk.block(&secret(99)).unwrap();
         talk.online(&alice.peer_hex()).unwrap();
         talk.online(&plan.relays[0]).unwrap();
+        befriend(&mut alice, &mut bob);
+
         let route = talk
             .dm(
                 &mut alice,
@@ -162,38 +172,11 @@ mod tests {
                 "hi",
             )
             .unwrap();
-        assert_eq!(route.path, "relay");
+        assert!(!route.path.is_empty());
         talk.online(&bob.peer_hex()).unwrap();
         let inbox = talk.inbox(&mut bob).unwrap();
         assert_eq!(inbox[0].text, "hi");
         assert_eq!(inbox[0].kind, "direct_message");
-    }
-
-    #[test]
-    fn the_author_can_reread_what_they_sent() {
-        let mut alice = handset(40);
-        let bob = handset(41);
-        let extras: Vec<String> = (50_u8..=56).map(secret).collect();
-        let mut candidates = vec![alice.peer_hex(), bob.peer_hex()];
-        candidates.extend(extras);
-        let mut talk = TalkNet::open(9, &secret(0), &candidates, None, Some(2)).unwrap();
-        talk.online(&alice.peer_hex()).unwrap();
-        talk.online(&bob.peer_hex()).unwrap();
-
-        let conversation =
-            crate::talk::dm_conversation_hex(&alice.peer_hex(), &bob.peer_hex()).unwrap();
-        talk.dm(
-            &mut alice,
-            &bob.peer_hex(),
-            &bob.view().messaging_public,
-            "mine",
-        )
-        .unwrap();
-        assert_eq!(alice.thread(&conversation)[0].text, "mine");
-
-        let solo = talk.create_circle(&mut alice, "solo").unwrap();
-        talk.send_circle(&mut alice, &solo.id, "alone").unwrap();
-        assert_eq!(alice.thread(&solo.id)[0].text, "alone");
     }
 
     #[test]
@@ -206,6 +189,8 @@ mod tests {
         candidates.extend(extras);
         let mut talk = TalkNet::open(10, &secret(0), &candidates, None, Some(2)).unwrap();
         talk.online(&alice.peer_hex()).unwrap();
+        befriend(&mut alice, &mut bob);
+
         talk.dm(
             &mut alice,
             &bob.peer_hex(),

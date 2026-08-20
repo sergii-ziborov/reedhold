@@ -12,11 +12,13 @@ use std::collections::{BTreeMap, BTreeSet};
 /// Multi-node simulator and the first real routing implementation.
 #[derive(Clone, Debug)]
 pub struct Fabric {
-    plan: SyncPlan,
-    blocked: BTreeSet<PeerId>,
-    nodes: BTreeMap<PeerId, NodeState>,
-    table: PeerTable,
-    clock: u64,
+    pub(crate) plan: SyncPlan,
+    pub(crate) blocked: BTreeSet<PeerId>,
+    pub(crate) nodes: BTreeMap<PeerId, NodeState>,
+    pub(crate) table: PeerTable,
+    pub(crate) clock: u64,
+    /// Mailbox topic, as a point in the same key space, to its listeners.
+    pub(crate) topics: BTreeMap<PeerId, BTreeSet<PeerId>>,
 }
 
 impl Fabric {
@@ -36,7 +38,14 @@ impl Fabric {
             nodes,
             table: PeerTable::new(),
             clock: 0,
+            topics: BTreeMap::new(),
         }
+    }
+
+    /// Current fabric time.
+    #[must_use]
+    pub const fn now(&self) -> u64 {
+        self.clock
     }
 
     /// Advance the fabric clock. Liveness and uptime are measured against it.
@@ -81,6 +90,9 @@ impl Fabric {
     /// Returns [`Error::Mesh`] when the peer is unknown.
     pub fn online(&mut self, peer: PeerId) -> Result<()> {
         self.node_mut(peer)?.online = true;
+        // Appearing is itself an observation. Without this the table only ever
+        // learns about senders, and a walk has nobody to hand a payload to.
+        self.table.observe(peer, self.clock, None);
         self.flush_for(peer);
         Ok(())
     }
@@ -182,7 +194,7 @@ impl Fabric {
         }
     }
 
-    fn live_relay(&self) -> Option<PeerId> {
+    pub(crate) fn live_relay(&self) -> Option<PeerId> {
         self.plan
             .relays
             .iter()
@@ -190,17 +202,17 @@ impl Fabric {
             .find(|relay| self.is_live(*relay))
     }
 
-    fn is_live(&self, peer: PeerId) -> bool {
+    pub(crate) fn is_live(&self, peer: PeerId) -> bool {
         !self.blocked.contains(&peer) && self.nodes.get(&peer).is_some_and(|node| node.online)
     }
 
-    fn node(&self, peer: PeerId) -> Result<&NodeState> {
+    pub(crate) fn node(&self, peer: PeerId) -> Result<&NodeState> {
         self.nodes
             .get(&peer)
             .ok_or(Error::Mesh("unknown mesh peer"))
     }
 
-    fn node_mut(&mut self, peer: PeerId) -> Result<&mut NodeState> {
+    pub(crate) fn node_mut(&mut self, peer: PeerId) -> Result<&mut NodeState> {
         self.nodes
             .get_mut(&peer)
             .ok_or(Error::Mesh("unknown mesh peer"))

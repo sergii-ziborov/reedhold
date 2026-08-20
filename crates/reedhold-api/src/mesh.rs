@@ -55,6 +55,47 @@ impl MeshSession {
         })
     }
 
+    /// Fabric time, in seconds. Mailbox epochs are measured against it.
+    #[must_use]
+    pub const fn now(&self) -> u64 {
+        self.fabric.now()
+    }
+
+    /// Advance fabric time and refresh peer liveness.
+    pub fn tick(&mut self, now: u64) {
+        self.fabric.tick(now);
+    }
+
+    /// Listen on a mailbox topic.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Codec`] when the peer hex is invalid.
+    pub fn subscribe(&mut self, peer_hex: &str, topic: reedhold_core::Digest32) -> Result<()> {
+        self.fabric
+            .subscribe(PeerId::from_hex(peer_hex)?, PeerId::from_digest(topic));
+        Ok(())
+    }
+
+    /// Send to a mailbox topic instead of a named peer.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Mesh`] when the sender is unknown.
+    pub fn send_topic(
+        &mut self,
+        from_hex: &str,
+        topic: reedhold_core::Digest32,
+        payload: &str,
+    ) -> Result<RouteView> {
+        let route = self.fabric.send_topic(
+            PeerId::from_hex(from_hex)?,
+            PeerId::from_digest(topic),
+            payload.as_bytes().to_vec(),
+        )?;
+        Ok(view_of(&route))
+    }
+
     /// Admit a late peer without rebuilding the fabric.
     ///
     /// # Errors
@@ -104,13 +145,7 @@ impl MeshSession {
             PeerId::from_hex(to_hex)?,
             payload.as_bytes().to_vec(),
         )?;
-        Ok(RouteView {
-            path: route.as_str().to_owned(),
-            hop: match route {
-                reedhold_mesh::Route::ViaRelay(peer) => Some(peer.to_hex()),
-                _ => None,
-            },
-        })
+        Ok(view_of(&route))
     }
 
     /// Drain delivered payloads as UTF-8 when possible, else hex.
@@ -127,6 +162,17 @@ impl MeshSession {
                 Err(_) => reedhold_core::encode_hex(&bytes),
             })
             .collect())
+    }
+}
+
+fn view_of(route: &reedhold_mesh::Route) -> RouteView {
+    RouteView {
+        path: route.as_str().to_owned(),
+        hop: match route {
+            reedhold_mesh::Route::ViaRelay(peer) => Some(peer.to_hex()),
+            reedhold_mesh::Route::Hops(path) => path.last().map(|peer| peer.to_hex()),
+            _ => None,
+        },
     }
 }
 
@@ -153,7 +199,10 @@ mod tests {
         mesh.online(&alice).unwrap();
         mesh.online(&plan.relays[0]).unwrap();
         let route = mesh.send(&alice, &bob, "ping").unwrap();
-        assert_eq!(route.path, "relay");
+        // Either a relay or a walk toward bob is fine; what matters is that
+        // the payload waits in the network rather than going nowhere.
+        assert_ne!(route.path, "direct");
+        assert_ne!(route.path, "held");
         mesh.online(&bob).unwrap();
         assert_eq!(mesh.drain(&bob).unwrap(), ["ping"]);
     }

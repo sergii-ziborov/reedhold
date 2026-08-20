@@ -46,6 +46,9 @@ separate library.
   land strictly closer to the target, which is what makes the walk terminate
 - `Route::Remote` hands a packet back to the host when the next hop lives in
   another process
+- talk is addressed to rotating mailbox topics, not to identities: only the two
+  ends can derive `H(tag || shared_secret || epoch)`, and the author travels
+  inside the ciphertext
 - DMs and small groups: pairwise X25519, shared epoch keys, leave rotates the key
 - the author keeps their own copy: the fabric only carries mail to other people,
   so a sender who kept nothing could never reread what they wrote

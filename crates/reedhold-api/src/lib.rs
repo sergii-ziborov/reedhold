@@ -1,4 +1,4 @@
-//! Host-facing sync session. No live transport, no MCP, no async runtime.
+﻿//! Host-facing sync session. No live transport, no MCP, no async runtime.
 
 #![forbid(unsafe_code)]
 
@@ -11,6 +11,7 @@ mod inbox;
 mod market;
 mod mesh;
 mod persist;
+mod postbox;
 mod privacy;
 mod rep;
 mod rooms;

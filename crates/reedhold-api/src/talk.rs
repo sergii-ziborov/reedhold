@@ -2,6 +2,7 @@
 
 use crate::inbox::{CircleView, TalkView, circle_view, ingest_one};
 use crate::mesh::{MeshSession, RouteView};
+use crate::postbox::unwrap_item;
 use crate::session::Session;
 use reedhold_core::{ConversationId, Error, IdentityId, Result, decode32, encode_hex};
 use reedhold_event::{EventKind, TalkBody, TalkPacket, dm_conversation, seal_message};
@@ -9,7 +10,7 @@ use reedhold_protocol::Circle;
 
 /// Social overlay. Peer ids are identity digests.
 pub struct TalkNet {
-    mesh: MeshSession,
+    pub(crate) mesh: MeshSession,
 }
 
 /// Deterministic DM conversation hex. Alias-free.
@@ -95,7 +96,7 @@ impl TalkNet {
             conversation,
             envelope: seal_message(&key, text.as_bytes())?,
         };
-        let route = self.dispatch(from, to_hex, EventKind::DirectMessage, &body)?;
+        let route = self.dispatch_sealed(from, &key, EventKind::DirectMessage, &body)?;
         keep_own(from, EventKind::DirectMessage, conversation, text);
         Ok(route)
     }
@@ -209,9 +210,13 @@ impl TalkNet {
             .copied()
             .filter(|id| *id != me)
             .collect();
-        let mut routes = Vec::with_capacity(members.len());
-        for member in members {
-            routes.push(self.dispatch(from, &member.to_hex(), EventKind::GroupMessage, &body)?);
+        // One sealed copy on the group's own mailbox: every member listens on
+        // it, so fanning out one packet per member would only leak the roster
+        // size to whoever is carrying.
+        let secret = from.circle(group)?.invite_body().key;
+        let mut routes = Vec::with_capacity(1);
+        if !members.is_empty() {
+            routes.push(self.dispatch_sealed(from, &secret, EventKind::GroupMessage, &body)?);
         }
         keep_own(from, EventKind::GroupMessage, group, text);
         Ok(routes)
@@ -223,9 +228,14 @@ impl TalkNet {
     ///
     /// Returns [`Error::Mesh`] when the peer is unknown.
     pub fn inbox(&mut self, session: &mut Session) -> Result<Vec<TalkView>> {
+        self.listen(session)?;
+        let keyed = self.mailbox_keys(session)?;
         let mut out = Vec::new();
         for item in self.mesh.drain(&session.peer_hex())? {
-            if let Ok(view) = ingest_one(session, &item) {
+            let Some(plain) = unwrap_item(&item, &keyed) else {
+                continue;
+            };
+            if let Ok(view) = ingest_one(session, &plain) {
                 session.record_talk(view.clone());
                 out.push(view);
             }

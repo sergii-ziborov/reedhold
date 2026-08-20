@@ -1,4 +1,4 @@
-//! Mesh ports, daily lottery, and an in-process routing fabric.
+﻿//! Mesh ports, daily lottery, and an in-process routing fabric.
 
 #![forbid(unsafe_code)]
 
@@ -12,6 +12,7 @@ mod plan;
 mod ports;
 mod route;
 mod table;
+mod topic;
 mod walk;
 
 pub use bucket::{BUCKET_WIDTH, bucket_of};

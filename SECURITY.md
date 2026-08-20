@@ -15,7 +15,7 @@ These constructions use standard crates. They are a stand-in until
 [Blindplane](https://github.com/sergii-ziborov/blindplane) is wired as the
 security kernel. The Blindplane boundary must stay outside this workspace.
 
-## Known: the transport still addresses by identity
+## Addressing
 
 A device id is `SHA-256(tag || device_public)` and reveals nothing about the
 account. Device keys and the identity root are separate HKDF branches of the
@@ -23,14 +23,23 @@ account. Device keys and the identity root are separate HKDF branches of the
 back to an `IdentityId`. The test
 `a_device_id_reveals_nothing_about_the_identity` holds that line.
 
-The identity itself is another matter. `TalkPacket` carries `author` in the
-clear, and the fabric uses identity hex as the peer address. Every relay on a
-path therefore sees "identity A is talking to identity B". Message bodies are
-sealed; the social graph is not.
+Conversations no longer travel addressed to an identity. A DM or group message
+is posted to `H(tag || shared_secret || epoch)` — an address only the endpoints
+can derive, rotating every six hours. Author, device key, messaging key and the
+signed event all move inside the ciphertext, so a carrier sees an address it
+cannot attribute and bytes it cannot read. Two epochs of one conversation share
+no prefix an observer could group on.
 
-The fix is specified and not yet built: rotating mailbox topics derived from
-the pairwise shared secret, `H(shared_secret || epoch || "mailbox")`, so an
-outsider sees unrelated random ids rather than a conversation.
+Group invites still go identity-addressed: they are what delivers the group key
+that the group's mailbox is derived from.
+
+### What this does not cover yet
+
+A stranger cannot open a conversation. A pairwise address needs both halves of
+a shared secret, and a first message arrives before the recipient has any way
+to derive it. Closing that needs a sealed box under the recipient's published
+key — `delivery_topic` is the address side of it; the crypto side is not built.
+Until then a DM requires that both sides already hold each other's keys.
 
 ## Passwords
 

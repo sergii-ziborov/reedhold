@@ -167,6 +167,37 @@ impl Session {
             .unwrap_or_default()
     }
 
+    /// Static X25519 public key. Anyone who looked this account up has it.
+    #[must_use]
+    pub fn messaging_public(&self) -> [u8; 32] {
+        self.account.messaging().public_bytes()
+    }
+
+    /// Every secret this session can derive a mailbox address from.
+    ///
+    /// One per contact (the pairwise X25519 agreement) and one per group (the
+    /// epoch read key). Nobody else can compute these, which is exactly why
+    /// they make good routing addresses.
+    ///
+    /// # Errors
+    ///
+    /// Returns a protocol error when a contact key cannot be agreed.
+    pub fn mailbox_secrets(&self) -> Result<Vec<[u8; 32]>> {
+        let me = self.account.identity();
+        let mut out = Vec::with_capacity(self.contacts.len() + self.circles.len());
+        for (id, entry) in &self.contacts {
+            out.push(
+                self.account
+                    .messaging()
+                    .agree(&entry.messaging_public, me, *id)?,
+            );
+        }
+        for circle in self.circles.values() {
+            out.push(circle.invite_body().key);
+        }
+        Ok(out)
+    }
+
     pub(crate) fn record_talk(&mut self, view: crate::inbox::TalkView) {
         self.threads
             .entry(view.conversation.clone())
