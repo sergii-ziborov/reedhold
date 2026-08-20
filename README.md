@@ -75,9 +75,12 @@ separate library.
 - emission scaled by total proven work: a weak network mints little, and
   splitting changes no totals so it changes nothing
 - reputation v0: likes mature, cluster pumps are cheap, influence budget, not transferable
-- reports instead of a wordlist: expensive to make, settle at half speed, and
-  discounted to nothing from a correlated cluster, so a pile-on buys little and
-  scattered independent witnesses bury a post that calls for harm
+- reports instead of a protocol wordlist: expensive to make, settle at half
+  speed, discounted from a correlated cluster, and saturating past a knee, so
+  that being outnumbered is never the same as being wrong
+- a reader's own word screen (`Screen`, Aho-Corasick over folded text) hides
+  lines in that reader's feed and touches no reputation: the list is a view,
+  never a verdict, and homoglyphs and separators fold before matching
 - accounts declare whether they are a person, an agent, or the two together —
   disclosure only, since nothing in the rules reads the kind: an agent earns
   weight from the same storage, relay and repair a person would
