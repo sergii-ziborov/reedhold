@@ -1,7 +1,8 @@
 //! In-process reputation graph. Simulation first, no money.
 
 use crate::factor::{
-    budget_factor, curator_factor, epoch_budget, independence, rep_factor, topic_factor,
+    budget_factor, curator_factor, epoch_budget, independence, rep_factor, saturated_objection,
+    topic_factor,
 };
 use crate::identity::IdentityRep;
 use crate::kind::ReactionKind;
@@ -111,7 +112,7 @@ impl Graph {
                 positive = positive.saturating_add(weight);
             }
         }
-        let penalty = mul(negative, DISLIKE_LAMBDA);
+        let penalty = mul(saturated_objection(negative), DISLIKE_LAMBDA);
         ContentScore {
             positive,
             negative,

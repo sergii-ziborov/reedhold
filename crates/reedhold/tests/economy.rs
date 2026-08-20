@@ -190,6 +190,64 @@ fn a_coordinated_pile_on_weighs_less_than_scattered_witnesses() {
     );
 }
 
+/// Being outnumbered is not being wrong.
+///
+/// Independence stops a cluster but never a real majority: unrelated people
+/// piling on are independent by every measure. Since the communities that get
+/// piled on are the ones that are outnumbered by definition, volume must not
+/// be able to decide anything. Objections go concave past the knee; support
+/// stays linear and can still answer them.
+#[test]
+fn a_large_crowd_cannot_bury_a_small_community() {
+    let mut graph = Graph::new();
+
+    // Two hundred unrelated, mature accounts pile onto one post. Every one of
+    // them is independent: there is no cluster to discount.
+    for byte in 50_u8..=250 {
+        graph.seed(identity(byte), mature());
+        graph
+            .react(Reaction {
+                author: identity(byte),
+                target: post(),
+                kind: ReactionKind::Report,
+                cluster: Digest32::from_bytes([byte; 32]),
+                topic: Digest32::from_bytes([0; 32]),
+                created_at: 0,
+            })
+            .expect("independent objection");
+    }
+
+    // A community a fifth the size stands by it.
+    for byte in 2_u8..=40 {
+        graph.seed(identity(byte), mature());
+        graph
+            .react(Reaction {
+                author: identity(byte),
+                target: post(),
+                kind: ReactionKind::Endorse,
+                cluster: Digest32::from_bytes([byte; 32]),
+                topic: Digest32::from_bytes([0; 32]),
+                created_at: 0,
+            })
+            .expect("sustained support");
+    }
+
+    let score = graph.content(post(), 8 * WEEK);
+    assert!(
+        score.negative > score.positive,
+        "the crowd really is louder: {} against {}",
+        score.negative,
+        score.positive
+    );
+    assert!(
+        score.net > 0,
+        "and it still must not decide: net {} from {} objections and {} support",
+        score.net,
+        score.negative,
+        score.positive
+    );
+}
+
 /// The genesis key is a market privilege. It has no mint and no control.
 #[test]
 fn genesis_root_can_sell_ads_and_nothing_else() {

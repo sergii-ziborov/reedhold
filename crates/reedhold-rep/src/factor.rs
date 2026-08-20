@@ -50,6 +50,30 @@ pub fn budget_factor(spent: u32, cap: u32) -> Milli {
     ONE.saturating_sub(decay).max(AFTER_BUDGET)
 }
 
+/// Objections past this point stop adding up.
+const OBJECTION_KNEE: u32 = 8_000;
+
+/// Aggregate negative weight, saturated. Positive weight is never saturated.
+///
+/// Independence stops a cluster, but it cannot stop a real majority: a hundred
+/// thousand unrelated people piling on a minority are independent by every
+/// graph measure there is. Any rule that lets volume decide a verdict is
+/// therefore a weapon pointed at exactly the communities that are outnumbered
+/// by definition — which is most of the ones that get piled on.
+///
+/// So the curve goes concave past the knee. The tenth independent objection
+/// counts; the ten-thousandth barely moves anything. A crowd keeps its voice
+/// and loses its ability to convert headcount into a judgement, while support
+/// for the person being piled on stays linear and can still answer it.
+#[must_use]
+pub fn saturated_objection(raw: u32) -> u32 {
+    if raw <= OBJECTION_KNEE {
+        return raw;
+    }
+    let excess = raw - OBJECTION_KNEE;
+    OBJECTION_KNEE.saturating_add(isqrt(excess.saturating_mul(4)))
+}
+
 /// Weekly units: a floor plus sqrt of mature strength.
 #[must_use]
 pub fn epoch_budget(strength: u32) -> u32 {
@@ -60,6 +84,24 @@ pub fn epoch_budget(strength: u32) -> u32 {
 mod tests {
     use super::{budget_factor, independence, rep_factor};
     use crate::milli::ONE;
+
+    #[test]
+    fn a_crowd_cannot_convert_headcount_into_a_verdict() {
+        use super::saturated_objection;
+        let modest = saturated_objection(4_000);
+        let large = saturated_objection(40_000);
+        let enormous = saturated_objection(4_000_000);
+
+        assert_eq!(modest, 4_000, "below the knee nothing is dampened");
+        // Ten times the pile-on is nowhere near ten times the effect, and a
+        // thousand times is barely more than ten times.
+        assert!(large < modest * 3);
+        assert!(enormous < large * 2);
+        assert!(
+            enormous < 20_000,
+            "four million objections stayed under twenty thousand: {enormous}"
+        );
+    }
 
     #[test]
     fn cluster_and_budget_saturate() {
