@@ -77,6 +77,7 @@ impl ChainSession {
             storage: parse_root(storage_hex)?,
             reputation: Digest32::from_bytes([0; 32]),
             ads: Digest32::from_bytes([0; 32]),
+            ledger: Digest32::from_bytes([0; 32]),
         };
         let header = self.ledger.commit(epoch, roots)?;
         self.light.follow(header)?;

@@ -16,6 +16,13 @@ pub struct EpochRoots {
     pub reputation: Digest32,
     /// Advertising market (zeros until stage 8).
     pub ads: Digest32,
+    /// Every account balance, as one Merkle root.
+    ///
+    /// This is what makes tampering self-defeating: alter a single balance and
+    /// the root changes, so the header hash changes, so every header after it
+    /// no longer links, and the branch stops descending from genesis. There is
+    /// no way to edit a number without abandoning the chain it sat in.
+    pub ledger: Digest32,
 }
 
 impl EpochRoots {
@@ -29,6 +36,7 @@ impl EpochRoots {
             storage: zero,
             reputation: zero,
             ads: zero,
+            ledger: zero,
         }
     }
 
@@ -43,6 +51,7 @@ impl EpochRoots {
                 self.storage.as_bytes(),
                 self.reputation.as_bytes(),
                 self.ads.as_bytes(),
+                self.ledger.as_bytes(),
             ],
         )
     }

@@ -1,4 +1,4 @@
-//! Compact header. Fixed fields only: no DM, photo, or search index bytes.
+﻿//! Compact header. Fixed fields only: no DM, photo, or search index bytes.
 
 use crate::hash::digest;
 use crate::roots::EpochRoots;
@@ -74,6 +74,7 @@ impl Header {
         writer.write_digest32(self.roots.storage.as_bytes());
         writer.write_digest32(self.roots.reputation.as_bytes());
         writer.write_digest32(self.roots.ads.as_bytes());
+        writer.write_digest32(self.roots.ledger.as_bytes());
         writer.write_digest32(self.state_root().as_bytes());
         writer.finish()
     }
@@ -103,6 +104,7 @@ impl Header {
             storage: Digest32::from_bytes(reader.read_digest32()?),
             reputation: Digest32::from_bytes(reader.read_digest32()?),
             ads: Digest32::from_bytes(reader.read_digest32()?),
+            ledger: Digest32::from_bytes(reader.read_digest32()?),
         };
         let embedded = Digest32::from_bytes(reader.read_digest32()?);
         reader.finish()?;
