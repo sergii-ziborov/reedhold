@@ -52,6 +52,10 @@ pub struct PrivacyView {
     pub blocked: Vec<String>,
     /// Conversation hexes hidden from the main list.
     pub archived: Vec<String>,
+    /// What this account declares itself to be.
+    pub kind: String,
+    /// Whether declared agents may open a conversation here.
+    pub accepts_automation: bool,
 }
 
 impl Session {
@@ -62,7 +66,43 @@ impl Session {
             policy: self.policy.as_str().to_owned(),
             blocked: self.blocked.iter().map(|id| id.to_hex()).collect(),
             archived: self.archived.iter().cloned().collect(),
+            kind: self.kind.as_str().to_owned(),
+            accepts_automation: self.accepts_automation,
         }
+    }
+
+    /// What this account says it is.
+    #[must_use]
+    pub fn kind(&self) -> reedhold_core::AgentKind {
+        self.kind
+    }
+
+    /// Declare this account a person, an agent, or the two together.
+    ///
+    /// Declaring costs nothing and grants nothing: an agent earns weight from
+    /// the same storage, relay and repair a person would, and its reactions
+    /// mature on the same curve. The point is that people can choose who they
+    /// talk to, and that undeclared automation becomes a broken promise on the
+    /// record rather than an unfalsifiable suspicion.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Identity`] when the name is not a known kind.
+    pub fn declare_kind(&mut self, name: &str) -> Result<reedhold_core::AgentKind> {
+        self.kind = reedhold_core::AgentKind::from_name(name)
+            .ok_or(Error::Identity("unknown participant kind"))?;
+        Ok(self.kind)
+    }
+
+    /// Choose whether declared agents may write to this account.
+    ///
+    /// This filters on what a sender *declared*, so it is a courtesy setting,
+    /// not a defence: someone who lies about being software is not stopped by
+    /// it. What actually stops abuse is that lying earns no weight — the rules
+    /// never asked what you are, only what you carried.
+    pub fn accept_automation(&mut self, allowed: bool) -> PrivacyView {
+        self.accepts_automation = allowed;
+        self.privacy()
     }
 
     /// Choose who may open a conversation.
@@ -196,6 +236,29 @@ mod tests {
             !me.accepts_from(reedhold_core::IdentityId::from_hex(&stranger.peer_hex()).unwrap())
         );
         assert!(me.set_policy("whoever").is_err());
+    }
+
+    #[test]
+    fn an_agent_is_judged_by_what_it_carried_not_by_what_it_is() {
+        let mut model = Session::create("pw", &secret(76)).unwrap().session;
+        let mut person = Session::create("pw", &secret(77)).unwrap().session;
+        model.declare_kind("agent").unwrap();
+
+        // Declaring changes nothing an account can do or earn. There is no
+        // branch anywhere that reads the kind and adjusts weight or limits.
+        assert_eq!(model.privacy().kind, "agent");
+        assert_eq!(person.privacy().kind, "person");
+        assert_eq!(model.privacy().policy, person.privacy().policy);
+        assert_eq!(
+            model.mailbox_secrets().unwrap().len(),
+            person.mailbox_secrets().unwrap().len()
+        );
+        assert!(model.declare_kind("robot").is_err());
+
+        // A person may still decline machine correspondence.
+        assert!(person.privacy().accepts_automation);
+        let view = person.accept_automation(false);
+        assert!(!view.accepts_automation);
     }
 
     #[test]

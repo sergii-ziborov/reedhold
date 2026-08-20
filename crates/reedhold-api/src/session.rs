@@ -27,6 +27,8 @@ pub struct Session {
     pub(crate) blocked: std::collections::BTreeSet<IdentityId>,
     pub(crate) archived: std::collections::BTreeSet<String>,
     pub(crate) policy: crate::privacy::MessagePolicy,
+    pub(crate) kind: reedhold_core::AgentKind,
+    pub(crate) accepts_automation: bool,
 }
 
 impl Session {
@@ -146,6 +148,8 @@ impl Session {
             blocked: std::collections::BTreeSet::new(),
             archived: std::collections::BTreeSet::new(),
             policy: crate::privacy::MessagePolicy::Everyone,
+            kind: reedhold_core::AgentKind::Person,
+            accepts_automation: true,
         }
     }
 

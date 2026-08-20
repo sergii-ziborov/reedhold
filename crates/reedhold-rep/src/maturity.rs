@@ -15,7 +15,9 @@ const YEAR: u64 = 365 * DAY;
 #[must_use]
 pub fn maturity(age_secs: u64, kind: ReactionKind) -> Milli {
     let age = match kind {
-        ReactionKind::Endorse => age_secs / 2,
+        // A claim that stakes the speaker settles at half speed: there has to
+        // be time for independent accounts to agree or fail to.
+        ReactionKind::Endorse | ReactionKind::Report => age_secs / 2,
         ReactionKind::Like | ReactionKind::Dislike => age_secs,
     };
     interpolate(age)

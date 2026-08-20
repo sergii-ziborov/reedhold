@@ -140,6 +140,56 @@ fn a_bought_burst_settles_below_mature_independent_support() {
     );
 }
 
+/// A brigade cannot bury a post, and independent witnesses can.
+///
+/// This is the whole moderation answer. The network never defines what hate
+/// speech is — a wordlist is evaded by spelling, punishes people quoting what
+/// they oppose, breaks across languages, and hands its author a lever over
+/// speech. Instead a report is expensive, settles slowly, and is discounted to
+/// nothing when it comes from a correlated cluster.
+#[test]
+fn a_coordinated_pile_on_weighs_less_than_scattered_witnesses() {
+    let mut brigade = Graph::new();
+    let mut witnesses = Graph::new();
+
+    // Forty accounts of one cluster all report the same post at once.
+    for byte in 2_u8..=41 {
+        brigade.seed(identity(byte), mature());
+        brigade
+            .react(Reaction {
+                author: identity(byte),
+                target: post(),
+                kind: ReactionKind::Report,
+                cluster: Digest32::from_bytes([7; 32]),
+                topic: Digest32::from_bytes([0; 32]),
+                created_at: 0,
+            })
+            .expect("brigade report");
+    }
+
+    // Eight unrelated accounts report it, and time passes.
+    for byte in 2_u8..=9 {
+        witnesses.seed(identity(byte), mature());
+        witnesses
+            .react(Reaction {
+                author: identity(byte),
+                target: post(),
+                kind: ReactionKind::Report,
+                cluster: Digest32::from_bytes([byte; 32]),
+                topic: Digest32::from_bytes([0; 32]),
+                created_at: 0,
+            })
+            .expect("independent report");
+    }
+
+    let piled = brigade.content(post(), 60).negative;
+    let settled = witnesses.content(post(), 4 * WEEK).negative;
+    assert!(
+        settled > piled,
+        "eight independents ({settled}) must outweigh forty of one cluster ({piled})"
+    );
+}
+
 /// The genesis key is a market privilege. It has no mint and no control.
 #[test]
 fn genesis_root_can_sell_ads_and_nothing_else() {
