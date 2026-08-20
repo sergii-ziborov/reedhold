@@ -571,6 +571,7 @@ dependencies = [
 name = "reedhold-chain"
 version = "0.1.0"
 dependencies = [
+ "ed25519-dalek",
  "reedhold-codec",
  "reedhold-core",
  "sha2",

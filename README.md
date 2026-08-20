@@ -63,7 +63,17 @@ separate library.
 - public topic rooms: slug is a local label; posts carry identity hex
 - owner-admin groups: invite and remove rotate the epoch key
 - Reed-Solomon durable objects: 4-of-6, survive a third of holders, then repair
-- compact chain headers: identity/group/storage Merkle roots, 64-header light window, no message bytes
+- compact chain headers: identity/group/storage/ledger Merkle roots, 64-header light window, no message bytes
+- every account balance folded into the header, so editing one number breaks
+  every link after it and the branch stops descending from genesis
+- genesis compiled into the binary, with no constructor that takes one from
+  outside: a chain claiming another beginning is refused without being weighed
+- fork choice on accumulated proven work, never on length, and never at all
+  below a finalised height
+- per-epoch committee drawn from settled randomness, quorum measured in weight
+  rather than seats, so splitting one worker into a thousand buys no extra say
+- emission scaled by total proven work: a weak network mints little, and
+  splitting changes no totals so it changes nothing
 - reputation v0: likes mature, cluster pumps are cheap, influence budget, not transferable
 - attention-market sandbox: batch uniform-price on `(topic, bucket, epoch)`, no user-id targeting
 - proof of contribution: storage/relay/repair mint credits; history stays; popularity is not consensus

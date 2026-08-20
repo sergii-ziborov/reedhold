@@ -4,6 +4,7 @@
 
 mod anchor;
 mod checkpoint;
+mod committee;
 mod fork;
 mod hash;
 mod header;
@@ -15,6 +16,7 @@ mod roots;
 
 pub use anchor::{NETWORK_GENESIS, network_genesis, network_rule};
 pub use checkpoint::Checkpoint;
+pub use committee::{BEACON_LOOKBACK, Committee, Seat};
 pub use fork::{Branch, ForkChoice};
 pub use header::Header;
 pub use ledger::Ledger;
